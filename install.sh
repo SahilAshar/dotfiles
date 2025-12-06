@@ -40,6 +40,25 @@ install_autocomplete() {
   git clone https://github.com/zsh-users/zsh-autosuggestions.git "$HOME/.oh-my-zsh/custom/plugins/zsh-autosuggestions"
 }
 
+install_powerlevel10k() {
+  local zsh_custom="${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}"
+  local theme_dir="$zsh_custom/themes/powerlevel10k"
+
+  if [ -d "$theme_dir" ]; then
+    echo "Powerlevel10k already installed at $theme_dir"
+    return
+  fi
+
+  if ! command -v git >/dev/null 2>&1; then
+    echo "Error: git is required to install Powerlevel10k."
+    exit 1
+  fi
+
+  echo "Installing Powerlevel10k theme into $theme_dir..."
+  mkdir -p "$zsh_custom/themes"
+  git clone --depth=1 https://github.com/romkatv/powerlevel10k.git "$theme_dir"
+}
+
 link_file() {
   local src="$DOTFILES_DIR/$1"
   local dest="$HOME/$2"
@@ -64,9 +83,17 @@ link_file() {
 
 install_ohmyzsh
 
+# Install Powerlevel10k theme
+install_powerlevel10k
+
 # Install custom plugins
 install_autocomplete
 
 link_file "zsh/.zshrc" ".zshrc"
+
+# Optional: only if you've actually created and committed .p10k.zsh
+if [ -f "$DOTFILES_DIR/zsh/.p10k.zsh" ]; then
+  link_file "zsh/.p10k.zsh" ".p10k.zsh"
+fi
 
 echo "Done. Open a new terminal or run: exec zsh"
