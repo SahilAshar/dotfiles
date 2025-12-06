@@ -91,7 +91,6 @@ install_autocomplete
 
 link_file "zsh/.zshrc" ".zshrc"
 
-# Optional: only if you've actually created and committed .p10k.zsh
 if [ -f "$DOTFILES_DIR/zsh/.p10k.zsh" ]; then
   link_file "zsh/.p10k.zsh" ".p10k.zsh"
 fi
