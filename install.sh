@@ -1,8 +1,14 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-DOTFILES_DIR="${DOTFILES_DIR:-$HOME/dotfiles}"
+#!/usr/bin/env bash
+set -euo pipefail
 
+# Directory where this script resides (i.e., the repo root)
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")" && pwd)"
+DOTFILES_DIR="${DOTFILES_DIR:-$SCRIPT_DIR}"
+
+echo "PWD: $(pwd)"
 echo "Using dotfiles dir: $DOTFILES_DIR"
 
 install_ohmyzsh() {
@@ -22,6 +28,16 @@ install_ohmyzsh() {
   export KEEP_ZSHRC=yes
 
   sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+}
+
+install_autocomplete() {
+  if [ -d "$HOME/.oh-my-zsh/custom/plugins/zsh-autosuggestions" ]; then
+    echo "zsh-autosuggestions already installed."
+    return
+  fi
+
+  echo "Installing zsh-autosuggestions..."
+  git clone https://github.com/zsh-users/zsh-autosuggestions.git "$HOME/.oh-my-zsh/custom/plugins/zsh-autosuggestions"
 }
 
 link_file() {
@@ -47,6 +63,10 @@ link_file() {
 }
 
 install_ohmyzsh
+
+# Install custom plugins
+install_autocomplete
+
 link_file "zsh/.zshrc" ".zshrc"
 
 echo "Done. Open a new terminal or run: exec zsh"
