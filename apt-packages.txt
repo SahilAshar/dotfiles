@@ -1,0 +1,4 @@
+# List of apt packages to install via install.sh
+# Lines starting with # or blank lines are ignored.
+zsh
+ripgrep

@@ -7,9 +7,38 @@ set -euo pipefail
 # Directory where this script resides (i.e., the repo root)
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")" && pwd)"
 DOTFILES_DIR="${DOTFILES_DIR:-$SCRIPT_DIR}"
+APT_PACKAGES_FILE="${APT_PACKAGES_FILE:-$DOTFILES_DIR/apt-packages.txt}"
 
 echo "PWD: $(pwd)"
 echo "Using dotfiles dir: $DOTFILES_DIR"
+
+install_apt_packages() {
+  if [ ! -f "$APT_PACKAGES_FILE" ]; then
+    echo "No apt package file at $APT_PACKAGES_FILE; skipping apt installs."
+    return
+  fi
+
+  if ! command -v apt-get >/dev/null 2>&1; then
+    echo "apt-get not available; skipping apt installs."
+    return
+  fi
+
+  mapfile -t apt_packages < <(sed -e 's/#.*//' -e 's/^[[:space:]]*//' -e '/^$/d' "$APT_PACKAGES_FILE")
+  if [ "${#apt_packages[@]}" -eq 0 ]; then
+    echo "No apt packages listed in $APT_PACKAGES_FILE; skipping apt installs."
+    return
+  fi
+
+  echo "Installing apt packages: ${apt_packages[*]}"
+
+  if command -v sudo >/dev/null 2>&1 && [ "$EUID" -ne 0 ]; then
+    sudo apt-get update
+    sudo apt-get install -y "${apt_packages[@]}"
+  else
+    apt-get update
+    apt-get install -y "${apt_packages[@]}"
+  fi
+}
 
 install_ohmyzsh() {
   if [ -d "$HOME/.oh-my-zsh" ]; then
@@ -80,6 +109,8 @@ link_file() {
   ln -s "$src" "$dest"
   echo "Linked $dest -> $src"
 }
+
+install_apt_packages
 
 install_ohmyzsh
 
