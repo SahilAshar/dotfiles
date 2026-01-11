@@ -11,6 +11,7 @@ APT_PACKAGES_FILE="${APT_PACKAGES_FILE:-$DOTFILES_DIR/apt-packages.txt}"
 
 echo "PWD: $(pwd)"
 echo "Using dotfiles dir: $DOTFILES_DIR"
+echo "Bootstrap mode: re-checking installs"
 
 install_apt_packages() {
   if [ ! -f "$APT_PACKAGES_FILE" ]; then
@@ -29,14 +30,26 @@ install_apt_packages() {
     return
   fi
 
-  echo "Installing apt packages: ${apt_packages[*]}"
+  local missing_packages=()
+  for package in "${apt_packages[@]}"; do
+    if ! dpkg -s "$package" >/dev/null 2>&1; then
+      missing_packages+=("$package")
+    fi
+  done
+
+  if [ "${#missing_packages[@]}" -eq 0 ]; then
+    echo "Apt packages already installed."
+    return
+  fi
+
+  echo "Installing apt packages: ${missing_packages[*]}"
 
   if command -v sudo >/dev/null 2>&1 && [ "$EUID" -ne 0 ]; then
     sudo apt-get update
-    sudo apt-get install -y "${apt_packages[@]}"
+    sudo apt-get install -y "${missing_packages[@]}"
   else
     apt-get update
-    apt-get install -y "${apt_packages[@]}"
+    apt-get install -y "${missing_packages[@]}"
   fi
 }
 
@@ -98,6 +111,10 @@ link_file() {
   fi
 
   if [ -L "$dest" ]; then
+    if [ "$(readlink "$dest")" = "$src" ]; then
+      echo "Symlink already set for $dest -> $src"
+      return
+    fi
     # existing symlink -> replace
     rm "$dest"
   elif [ -e "$dest" ]; then
@@ -125,5 +142,8 @@ link_file "zsh/.zshrc" ".zshrc"
 if [ -f "$DOTFILES_DIR/zsh/.p10k.zsh" ]; then
   link_file "zsh/.p10k.zsh" ".p10k.zsh"
 fi
+
+echo "Re-symlinking prompts via scripts/install-prompts.sh"
+"$DOTFILES_DIR/scripts/install-prompts.sh"
 
 echo "Done. Open a new terminal or run: exec zsh"

@@ -1,0 +1,22 @@
+# Prompt Generator Instructions
+
+Create four sub-agent outputs by filling in the existing template files below. Do **not** create new files or reformat the templates; only replace the placeholder slots inside each file.
+
+## Assignment
+- Sub-agent A: `prompts/plan.md`
+- Sub-agent B: `prompts/implement.md`
+- Sub-agent C: `prompts/test.md`
+- Sub-agent D: `prompts/deploy.md`
+
+## Requirements
+- Each sub-agent must fill in the template placeholders with repository-specific details.
+- Each sub-agent must cite **specific files and/or commands found in the repo** (e.g., `install.sh`, `apt-packages.txt`, `rg 'pattern' file`, `ls path`).
+- Use **exact** commands or file paths from the repository; avoid generic placeholders.
+- Keep the existing section headings: Goal, Inputs, Steps, Output Format.
+- Do not add new sections or remove any template fields.
+
+## Output
+Return the four filled templates (one per sub-agent) with placeholders replaced by concrete repo-specific data and citations.
+
+## Post-generation
+Run `scripts/install-prompts.sh` (or `install.sh`) so the newly generated prompt files appear immediately in the Copilot `/prompt` list.
