@@ -3,11 +3,11 @@ set -euo pipefail
 
 usage() {
   cat <<'USAGE'
-Usage: scripts/install-prompts.sh [--copy|--symlink] [--dest PATH]
+Usage: scripts/install-prompts.sh [--symlink|--copy] [--dest PATH]
 
 Options:
-  --copy     Copy prompt files (default).
-  --symlink  Symlink prompt files.
+  --symlink  Symlink prompt files (default).
+  --copy     Copy prompt files.
   --dest     Destination directory for Copilot Chat prompts.
 
 Environment:
@@ -16,7 +16,7 @@ Environment:
 USAGE
 }
 
-MODE="copy"
+MODE="symlink"
 DEST=""
 
 while [[ $# -gt 0 ]]; do

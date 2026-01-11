@@ -1,13 +1,10 @@
 # Copilot Chat Prompts
 
-This repo ships reusable prompt files for a Docker + Makefile workflow.
+This repo ships a reusable prompt generator to create repo-specific prompts.
 
 ## Files
 
-- `prompts/plan.md` — planning steps.
-- `prompts/implement.md` — implementation guidance.
-- `prompts/test.md` — testing guidance.
-- `prompts/docker-run.md` — Docker run instructions.
+- `prompts/generate.md` — generates repo-specific prompts and instructions.
 
 ## Install
 
@@ -17,17 +14,23 @@ Run the installer from the repo root:
 scripts/install-prompts.sh
 ```
 
-By default, prompts are copied into your VS Code user prompts directory:
+By default, prompts are symlinked into your VS Code user prompts directory:
 
 - macOS: `~/Library/Application Support/Code/User/prompts`
 - Linux: `~/.config/Code/User/prompts`
 
 ### Options
 
-Copy or symlink prompt files:
+Symlink prompt files (default):
 
 ```bash
-scripts/install-prompts.sh --symlink
+scripts/install-prompts.sh
+```
+
+Copy instead of symlinking:
+
+```bash
+scripts/install-prompts.sh --copy
 ```
 
 Override the destination directory:
@@ -44,4 +47,5 @@ CODE_VARIANT="Code - Insiders" scripts/install-prompts.sh
 
 ## Use in Copilot Chat
 
-Open Copilot Chat and use `/prompt` to select one of the installed prompt files.
+Open Copilot Chat and use `/prompt` to select `generate.md`, then run it to create
+repo-specific `plan`, `implement`, `test`, and `deploy` prompts for the project.

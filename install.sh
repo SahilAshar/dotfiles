@@ -126,4 +126,10 @@ if [ -f "$DOTFILES_DIR/zsh/.p10k.zsh" ]; then
   link_file "zsh/.p10k.zsh" ".p10k.zsh"
 fi
 
+if [ -x "$DOTFILES_DIR/scripts/install-prompts.sh" ]; then
+  "$DOTFILES_DIR/scripts/install-prompts.sh"
+else
+  echo "Prompt installer not found or not executable; skipping."
+fi
+
 echo "Done. Open a new terminal or run: exec zsh"
