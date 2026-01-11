@@ -22,7 +22,7 @@ Install prompts into your VS Code profile (symlink by default):
 scripts/install-prompts.sh
 ```
 
-Generate repo-specific prompts using `prompts/generate.md`, then re-run the
+Generate repo-specific prompts using `.github/prompts/generate.prompt.md`, then re-run the
 installer so the new prompts appear in the `/prompt` list:
 
 ```bash
