@@ -46,7 +46,7 @@ while [[ $# -gt 0 ]]; do
   done
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-SRC_DIR="$REPO_ROOT/prompts"
+SRC_DIR="$REPO_ROOT/.github/prompts"
 
 if [[ ! -d "$SRC_DIR" ]]; then
   echo "Prompt directory not found: $SRC_DIR" >&2
@@ -65,7 +65,7 @@ fi
 
 mkdir -p "$DEST"
 
-for file in "$SRC_DIR"/*.md; do
+for file in "$SRC_DIR"/*.prompt.md; do
   base="$(basename "$file")"
   target="$DEST/$base"
   if [[ "$MODE" == "symlink" ]]; then

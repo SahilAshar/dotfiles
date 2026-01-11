@@ -1,12 +1,17 @@
+---
+name: generate
+description: Generate repo-specific prompt templates for this repo
+---
+
 # Prompt Generator Instructions
 
 Create four sub-agent outputs by filling in the existing template files below. Do **not** create new files or reformat the templates; only replace the placeholder slots inside each file.
 
 ## Assignment
-- Sub-agent A: `prompts/plan.md`
-- Sub-agent B: `prompts/implement.md`
-- Sub-agent C: `prompts/test.md`
-- Sub-agent D: `prompts/deploy.md`
+- Sub-agent A: `.github/prompts/plan.prompt.md`
+- Sub-agent B: `.github/prompts/implement.prompt.md`
+- Sub-agent C: `.github/prompts/test.prompt.md`
+- Sub-agent D: `.github/prompts/deploy.prompt.md`
 
 ## Requirements
 - Each sub-agent must fill in the template placeholders with repository-specific details.

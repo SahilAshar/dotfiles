@@ -4,7 +4,7 @@ This repo ships a reusable prompt generator to create repo-specific prompts.
 
 ## Files
 
-- `prompts/generate.md` — generates repo-specific prompts and instructions.
+- `.github/prompts/generate.prompt.md` — generates repo-specific prompts and instructions.
 
 ## Install
 
@@ -47,5 +47,5 @@ CODE_VARIANT="Code - Insiders" scripts/install-prompts.sh
 
 ## Use in Copilot Chat
 
-Open Copilot Chat and use `/prompt` to select `generate.md`, then run it to create
+Open Copilot Chat and use `/prompt` to select `generate.prompt.md`, then run it to create
 repo-specific `plan`, `implement`, `test`, and `deploy` prompts for the project.
