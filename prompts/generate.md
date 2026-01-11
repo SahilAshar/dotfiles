@@ -12,7 +12,7 @@ that make this project easy to understand, test, and deploy.
    - `prompts/test.md`
    - `prompts/deploy.md`
 3. Generate or update:
-   - `copilotinstructions.md`
+   - `copilot-instructions.md` (or the repo’s existing Copilot instructions file)
    - `AGENTS.md`
 
 ## Method
@@ -39,9 +39,14 @@ These prompts should:
 - Provide minimal, actionable steps.
 
 ### 3) Instructions files
-Create or update `copilotinstructions.md` and `AGENTS.md`:
-- Keep instructions concise, specific, and actionable.
-- Include testing expectations and preferred commands.
+Create or update the Copilot instructions file and `AGENTS.md`:
+- Prefer `.github/copilot-instructions.md` unless the repo already uses a different
+  instructions filename (e.g., `CopilotInstructions.md`).
+- If VS Code supports it, run **“Copilot: Generate Instructions”** from the Command Palette
+  to seed the file, then refine it for accuracy.
+- Keep instructions short, concrete, and repo-specific (commands, paths, naming).
+- Include testing expectations, setup requirements, and preferred commands.
+- Avoid long prose; use bullets and examples.
 
 ## Guardrails
 
@@ -55,5 +60,5 @@ Create or update `copilotinstructions.md` and `AGENTS.md`:
 - [ ] `prompts/implement.md` created with repo-specific implementation guidance.
 - [ ] `prompts/test.md` created with repo-specific testing guidance.
 - [ ] `prompts/deploy.md` created with repo-specific deployment guidance.
-- [ ] `copilotinstructions.md` created/updated.
+- [ ] Copilot instructions file created/updated.
 - [ ] `AGENTS.md` created/updated.
