@@ -24,4 +24,4 @@ Create four sub-agent outputs by filling in the existing template files below. D
 Return the four filled templates (one per sub-agent) with placeholders replaced by concrete repo-specific data and citations.
 
 ## Post-generation
-Run `scripts/install-prompts.sh` (or `install.sh`) so the newly generated prompt files appear immediately in the Copilot `/prompt` list.
+Instruct the user to rerun `./install.sh` from the dotfiles repo so the updated prompts sync for future sessions (the script calls `scripts/install-prompts.sh` internally).
