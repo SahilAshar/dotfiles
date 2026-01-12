@@ -1,58 +1,21 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-usage() {
-  cat <<'USAGE'
-Usage: scripts/install-prompts.sh [--symlink|--copy] [--dest PATH]
-
-Options:
-  --symlink  Symlink prompt files (default).
-  --copy     Copy prompt files.
-  --dest     Destination directory for Copilot Chat prompts.
-
-Environment:
-  CODE_VARIANT      VS Code folder name (default: Code). Example: "Code - Insiders".
-  XDG_CONFIG_HOME   Overrides ~/.config on Linux.
-USAGE
-}
-
-MODE="symlink"
-DEST=""
-
-while [[ $# -gt 0 ]]; do
-  case "$1" in
-    --copy)
-      MODE="copy"
-      shift
-      ;;
-    --symlink)
-      MODE="symlink"
-      shift
-      ;;
-    --dest)
-      DEST="${2:-}"
-      shift 2
-      ;;
-    -h|--help)
-      usage
-      exit 0
-      ;;
-    *)
-      echo "Unknown argument: $1" >&2
-      usage >&2
-      exit 1
-      ;;
-  esac
-  done
-
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-SRC_DIR="$REPO_ROOT/.github/prompts"
+SRC_DIR="$REPO_ROOT/github/.github/prompts"
 
 if [[ ! -d "$SRC_DIR" ]]; then
-  echo "Prompt directory not found: $SRC_DIR" >&2
+  echo "Canonical prompt directory not found: $SRC_DIR" >&2
   exit 1
 fi
 
+GENERATE_FILE="$SRC_DIR/generate.prompt.md"
+if [[ ! -f "$GENERATE_FILE" ]]; then
+  echo "Missing generate.prompt.md in $SRC_DIR" >&2
+  exit 1
+fi
+
+DEST="${COPILOT_PROMPTS_DIR:-}"
 if [[ -z "$DEST" ]]; then
   CODE_VARIANT="${CODE_VARIANT:-Code}"
   if [[ "$(uname -s)" == "Darwin" ]]; then
@@ -65,21 +28,17 @@ fi
 
 mkdir -p "$DEST"
 
-for file in "$SRC_DIR"/*.prompt.md; do
-  base="$(basename "$file")"
-  target="$DEST/$base"
-  if [[ "$MODE" == "symlink" ]]; then
-    ln -sf "$file" "$target"
-  else
-    cp -f "$file" "$target"
-  fi
-  echo "$MODE: $file -> $target"
-done
+echo "Symlinking generate prompt"
+echo "  source: $GENERATE_FILE"
+echo "  target: $DEST/generate.prompt.md"
+
+ln -sf "$GENERATE_FILE" "$DEST/generate.prompt.md"
 
 cat <<EOF
 
-Installed prompts to:
+Published generate.prompt.md to:
   $DEST
 
-Open Copilot Chat and use /prompt to select the files.
+Open Copilot Chat and run /generate to scaffold repo prompts.
+Set COPILOT_PROMPTS_DIR to override the destination if needed.
 EOF

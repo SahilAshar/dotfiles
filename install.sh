@@ -143,7 +143,7 @@ if [ -f "$DOTFILES_DIR/zsh/.p10k.zsh" ]; then
   link_file "zsh/.p10k.zsh" ".p10k.zsh"
 fi
 
-echo "Re-symlinking prompts via scripts/install-prompts.sh"
+echo "Syncing Copilot prompts (run ./install.sh; scripts/install-prompts.sh is internal)"
 "$DOTFILES_DIR/scripts/install-prompts.sh"
 
 echo "Done. Open a new terminal or run: exec zsh"
