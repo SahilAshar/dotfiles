@@ -7,24 +7,24 @@ argument-hint: "scope, commands, environment, results"
 # Test Prompt Template
 
 ## Goal
-Plan and document validation of installer and prompt changes in this dotfiles repository. [install.sh](install.sh#L130-L149) [scripts/install-prompts.sh](scripts/install-prompts.sh#L68-L85)
+Plan and document validation of dotfiles installer changes, ensuring prompt publishing, symlink updates, and package guardrails behave as expected. [install.sh](install.sh) [scripts/install-prompts.sh](scripts/install-prompts.sh)
 
 ## Inputs
-- Test scope: Cover install.sh flows, prompt installer behavior, and relevant shell config symlinks. [install.sh](install.sh#L104-L148) [zsh/.zshrc](zsh/.zshrc)
-- Commands available: Use install.sh and scripts/install-prompts.sh to exercise automation paths; optionally inspect apt packages. [install.sh](install.sh#L130-L148) [scripts/install-prompts.sh](scripts/install-prompts.sh#L68-L85) [apt-packages.txt](apt-packages.txt#L1-L4)
-- Environment notes: macOS users rely on Library/Application Support prompt destinations and may lack apt-get locally. [scripts/install-prompts.sh](scripts/install-prompts.sh#L56-L63) [install.sh](install.sh#L22-L53)
+- Test scope: Cover any touched scripts (install.sh, scripts/install-prompts.sh), prompt templates, and zsh configs linked into $HOME. [install.sh](install.sh) [github/.github/prompts](github/.github/prompts) [zsh/.zshrc](zsh/.zshrc)
+- Commands available: ./install.sh for end-to-end coverage, scripts/install-prompts.sh for direct prompt syncing, plus auxiliary checks such as cat apt-packages.txt or ls ~/Library/Application Support/Code/User/prompts. [install.sh](install.sh) [scripts/install-prompts.sh](scripts/install-prompts.sh) [apt-packages.txt](apt-packages.txt)
+- Environment notes: macOS defaults to Library/Application Support paths and often lacks apt-get, so tests should capture skipped package installs and any COPILOT_PROMPTS_DIR overrides. [install.sh](install.sh) [scripts/install-prompts.sh](scripts/install-prompts.sh)
 
 ## Steps
-1. Identify which installer segments and configs require coverage based on the proposed change. [install.sh](install.sh#L16-L148)
-2. Execute the necessary scripts or commands and capture outputs for verification. [install.sh](install.sh#L130-L148) [scripts/install-prompts.sh](scripts/install-prompts.sh#L68-L85)
-3. Summarize observed results, noting symlink updates and prompt deployment status. [install.sh](install.sh#L140-L148)
-4. Document any failures, including missing dependencies like apt-get, with suggested follow-ups. [install.sh](install.sh#L22-L53)
+1. Determine which installer stages need exercising (apt packages, symlink linking, prompt deployment) based on the change request. [install.sh](install.sh)
+2. Run the necessary scripts with representative environment variables, capturing stdout/stderr for apt skips, git clones, and prompt symlinks. [install.sh](install.sh) [scripts/install-prompts.sh](scripts/install-prompts.sh)
+3. Summarize observed results: files linked under $HOME, prompt files created in the VS Code profile, and any generated backups (*.bak). [install.sh](install.sh)
+4. Record failures or anomalies (e.g., missing curl, permission errors, incorrect prompt path) along with remediation steps. [install.sh](install.sh) [scripts/install-prompts.sh](scripts/install-prompts.sh)
 
 ## Output Format
-- Summary: Provide a concise overview of what was tested and why it matters for the change. [install.sh](install.sh#L130-L148)
+- Summary: Explain which workflows were exercised and why those tests prove the change is safe. [install.sh](install.sh)
 - Commands Run:
-  - Record the install.sh invocation and whether it completed successfully. [install.sh](install.sh#L130-L149)
-  - Capture the scripts/install-prompts.sh run (with flags if used) and its output. [scripts/install-prompts.sh](scripts/install-prompts.sh#L68-L85)
+  - Include the exact ./install.sh invocation (and flags/env vars) plus supporting commands like ls or tail for verification. [install.sh](install.sh)
+  - Capture standalone scripts/install-prompts.sh executions if prompts were the primary focus. [scripts/install-prompts.sh](scripts/install-prompts.sh)
 - Results:
-  - Detail pass/fail outcomes, including symlink or prompt installation status. [install.sh](install.sh#L140-L148)
-- Citations: List every referenced script, config, or doc used in the test report. [install.sh](install.sh#L16-L149) [scripts/install-prompts.sh](scripts/install-prompts.sh#L1-L85) [apt-packages.txt](apt-packages.txt#L1-L4) [zsh/.zshrc](zsh/.zshrc)
+  - Report pass/fail outcomes, linking evidence for symlinks, prompt files, or package installations. [install.sh](install.sh) [scripts/install-prompts.sh](scripts/install-prompts.sh)
+- Citations: Link every referenced script, config, or doc cited in the test report. [install.sh](install.sh) [scripts/install-prompts.sh](scripts/install-prompts.sh) [apt-packages.txt](apt-packages.txt) [zsh/.zshrc](zsh/.zshrc)
