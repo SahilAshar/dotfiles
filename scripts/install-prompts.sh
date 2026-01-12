@@ -28,6 +28,7 @@ fi
 
 mkdir -p "$DEST"
 
+echo "Deploying prompts from: $SRC_DIR"
 echo "Symlinking generate prompt"
 echo "  source: $GENERATE_FILE"
 echo "  target: $DEST/generate.prompt.md"
