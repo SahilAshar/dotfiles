@@ -9,7 +9,7 @@ This repo ships a reusable prompt generator to create repo-specific prompts. Can
 
 ## Install
 
-Run `./install.sh` from the repo root whenever you want to (re)install prompts. The bootstrapper invokes `scripts/install-prompts.sh` internally after syncing zsh files, so one entry point keeps Copilot prompts and shell config aligned. The helper logs `Deploying prompts from: ...` and always sources from [github/.github/prompts](github/.github/prompts).
+Run `./install.sh` from the repo root whenever you want to (re)install prompts. The bootstrapper invokes `scripts/install-prompts.sh` internally after syncing zsh files, so one entry point keeps Copilot prompts and shell config aligned. The helper logs a `Symlinking generate prompt` message with the source and target paths and always sources from [github/.github/prompts](github/.github/prompts).
 
 The installer only publishes the `/generate` prompt into your VS Code user prompt space. When you edit templates inside this repo, rerun `./install.sh` so that `/generate` always reflects the latest canonical instructions. Set `COPILOT_PROMPTS_DIR` if you need to override the default VS Code profile path, and `CODE_VARIANT` when targeting a different VS Code flavor (for example, Insiders).
 
