@@ -185,5 +185,5 @@ If you're thinking of converting prompt templates to custom agents:
 
 - [README](../README.md) — Repository overview and quick start
 - [docs/prompts.md](prompts.md) — Detailed prompt installation guide
-- [.github/prompts/](.github/prompts/) — Example prompt templates for this repo
-- [github/.github/prompts/](github/.github/prompts/) — Canonical template source
+- [.github/prompts/](../.github/prompts/) — Example prompt templates for this repo
+- [github/.github/prompts/](../github/.github/prompts/) — Canonical template source
