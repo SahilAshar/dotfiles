@@ -5,10 +5,10 @@ Priority-ordered checklist for evolving this dotfiles repository.
 ## High Priority (Do First)
 
 ### P0: Critical Cleanup
-- [ ] **Remove redundant directories**
-  - [ ] Delete `github/.github/prompts/` (canonical templates - no longer needed)
-  - [ ] Delete `.github/prompts/` (example outputs - cluttering repo)
-  - [ ] Delete `docs/prompts.md` (outdated prompt documentation)
+- [x] **Remove redundant directories**
+  - [x] Delete `github/.github/prompts/` (canonical templates - no longer needed)
+  - [x] Delete `.github/prompts/` (example outputs - cluttering repo)
+  - [x] Delete `docs/prompts.md` (outdated prompt documentation)
   - [ ] Clean up any `.bak` files from testing
 
 - [ ] **Git configuration**
@@ -43,7 +43,7 @@ Priority-ordered checklist for evolving this dotfiles repository.
   - [ ] Document: Add workflow to README
 
 ### P2: Documentation & Testing
-- [ ] **Update README.md** with new philosophy (see part D below)
+- [x] **Update README.md** with new philosophy
   
 - [ ] **Create testing checklist**
   - [ ] Test fresh Codespace creation

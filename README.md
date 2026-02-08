@@ -57,6 +57,8 @@ The installer is fully idempotent - safe to run multiple times.
     readability/
       SKILL.md
   copilot-instructions.md  # Always-on guidance (applies to all tasks)
+docs/
+  TODO.md            # Prioritized improvement checklist
 git/
   .gitconfig          # Git configuration template
 scripts/
@@ -69,7 +71,6 @@ zsh/
 apt-packages.txt     # Linux packages to install
 install.sh           # PRIMARY ENTRY POINT (auto-run by Codespaces)
 README.md            # You are here
-TODO.md              # Prioritized improvement checklist
 ```
 
 ## Agentic Workflow Strategy
