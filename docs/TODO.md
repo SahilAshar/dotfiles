@@ -45,12 +45,23 @@ Priority-ordered checklist for evolving this dotfiles repository.
 ### P2: Documentation & Testing
 - [x] **Update README.md** with new philosophy
   
-- [ ] **Create testing checklist**
-  - [ ] Test fresh Codespace creation
-  - [ ] Test local macOS install
-  - [ ] Test re-running install.sh (idempotency)
-  - [ ] Test with missing dependencies (no curl, no git)
+- [x] **Create testing checklist**
+  - [x] Create `tests/test-install.sh` with 22 tests covering install.sh
+  - [ ] Test fresh Codespace creation (manual)
+  - [ ] Test local macOS install (manual)
+  - [x] Test re-running install.sh (idempotency) — covered by test suite
+  - [ ] Test with missing dependencies (no curl, no git) — partial coverage
   
+- [x] **Dotfiles CI/CD** (GitHub Actions)
+  - [x] Create `.github/workflows/ci.yml` with lint + test + integration jobs
+  - [x] All jobs on `mcr.microsoft.com/devcontainers/universal` (Codespaces base image)
+  - [x] ShellCheck linting on all `.sh` files
+  - [x] Run `tests/test-install.sh` unit tests
+  - [x] Full `install.sh` integration test in container
+  - [x] Trigger on push to `main` and PRs
+  - [x] Fix ShellCheck warnings in existing scripts
+  - [ ] TODO: Add `macos-latest` runner job (do NOT implement yet)
+   
 - [ ] **Add troubleshooting guide**
   - [ ] Common errors and solutions
   - [ ] How to check logs in Codespaces
@@ -109,16 +120,24 @@ Priority-ordered checklist for evolving this dotfiles repository.
   - [ ] Load language-specific configs
   - [ ] Optional: MCP integration
 
-- [ ] **Cross-environment sync**
-  - [ ] Personal Codespaces vs work Codespaces
-  - [ ] Strategy for environment-specific overrides
-  - [ ] Document the pattern (don't implement in this repo)
+- [ ] **Enterprise dotfiles shim repo** (work GitHub)
+  - [ ] Create shim repo in enterprise GitHub org
+  - [ ] Shim `install.sh` clones this personal dotfiles repo (enterprise → personal is allowed)
+  - [ ] Shim layers work-specific configuration on top:
+    - [ ] Work-specific Copilot agents and skills
+    - [ ] Work-specific prompts and MCP server configs
+    - [ ] Internal Codespace base image CI (separate workflow)
+    - [ ] Enterprise git config overrides (email, signing, proxy)
+    - [ ] Work-specific VS Code extensions and settings
+  - [ ] Shim runs its own install script after personal dotfiles install
+  - [ ] Document the personal ↔ enterprise boundary in both READMEs
+  - [ ] Test with fresh enterprise Codespace
+  - [ ] _Note: Implementation happens on work machine with internal docs/MCPs_
 
-- [ ] **Dotfiles CI/CD**
-  - [ ] GitHub Actions to validate install.sh
-  - [ ] Shellcheck linting
-  - [ ] Test in Docker container
-  - [ ] Auto-generate skill from code changes?
+- [ ] **Dotfiles CI/CD — macOS runner**
+  - [ ] Add `macos-latest` job to CI workflow
+  - [ ] Validate install.sh graceful skip of apt-get
+  - [ ] Validate symlink creation on macOS
 
 ### P7: Community & Sharing
 - [ ] **Make repo a template**
@@ -177,10 +196,9 @@ Priority-ordered checklist for evolving this dotfiles repository.
   - [ ] Identify unused configurations
   - [ ] Remove or document "why kept but not used"
   
-- [ ] **Simplify install-prompts.sh**
-  - [ ] Current script only handles /generate
-  - [ ] Either expand to handle agents/skills or rename to reflect scope
-  - [ ] Consider: Should agents/skills be symlinked or copied?
+- [x] **Simplify install-prompts.sh**
+  - [x] Rewrote to discover agents/skills in `.github/` instead of referencing deleted prompts
+  - [ ] Consider: Should agents/skills be deployed globally (`~/.copilot/`) in future?
 
 ## Notes
 - This TODO is a living document - update as priorities shift

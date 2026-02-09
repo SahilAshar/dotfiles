@@ -22,7 +22,7 @@ echo "Dotfiles Installation"
 echo "=============================="
 echo "Script dir: $SCRIPT_DIR"
 echo "Dotfiles dir: $DOTFILES_DIR"
-echo "Environment: ${CODESPACES:+Codespaces}${CODESPACES:-Local}"
+if [ -n "${CODESPACES:-}" ]; then echo "Environment: Codespaces"; else echo "Environment: Local"; fi
 echo ""
 
 # Install apt packages (Linux/Codespaces only)
@@ -49,7 +49,7 @@ install_apt_packages() {
 
   # Check which packages are missing
   local missing_packages=()
-  for package in "${#apt_packages[@]}"; do
+  for package in "${apt_packages[@]}"; do
     if ! dpkg -s "$package" >/dev/null 2>&1; then
       missing_packages+=("$package")
     fi

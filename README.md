@@ -134,6 +134,25 @@ If I need templating or secret management later, I'll add it. Until then: YAGNI.
 
 This separation keeps dotfiles focused on portable capabilities while allowing per-project specialization.
 
+### Personal vs Enterprise Dotfiles
+
+This repo contains **personal, universal** configuration. For work environments, an enterprise dotfiles "shim" repo lives in the work GitHub org. The flow:
+
+1. Enterprise Codespaces is configured to use the **enterprise shim repo** as its dotfiles
+2. The shim's `install.sh` **clones this personal repo** first (enterprise → personal access is allowed)
+3. Personal `install.sh` runs, setting up the universal baseline (shell, agents, skills)
+4. The shim then **layers work-specific config** on top: enterprise agents, MCP servers, internal tool configs, git signing/email overrides
+
+**Why this direction?** Enterprise can pull from personal (public/accessible), but personal shouldn't depend on enterprise (access restrictions, IP boundaries). The shim pattern keeps work-specific config out of this repo while reusing everything universal.
+
+**What lives where:**
+| This repo (personal) | Enterprise shim (work) |
+|---|---|
+| Shell config (zsh, p10k) | Enterprise git config (email, signing) |
+| Universal agents & skills | Work-specific agents & prompts |
+| Personal git defaults | MCP server configurations |
+| CI on public Codespaces image | CI on internal Codespaces image |
+
 ## How It Works
 
 ### On Codespace Creation
@@ -190,15 +209,37 @@ See [`.github/skills/readability/SKILL.md`](.github/skills/readability/SKILL.md)
 ## Development Workflow
 
 1. **Make changes** - Edit files in this repo
-2. **Test locally** (if possible) - Run `./install.sh` and verify
-3. **Commit and push** - Changes go live
-4. **Test in fresh Codespace** - Create new Codespace, verify everything works
-5. **Iterate** - Fix issues, repeat
+2. **Run tests locally** - `bash tests/test-install.sh` (22 unit tests)
+3. **Lint** - `shellcheck install.sh scripts/*.sh tests/*.sh`
+4. **Commit and push** - CI runs automatically on PRs to `main`
+5. **Test in fresh Codespace** - Create new Codespace, verify everything works
+6. **Iterate** - Fix issues, repeat
 
 For major changes, test in Docker container before pushing:
 ```bash
 docker run -it --rm -v "$(pwd):/dotfiles" ubuntu:24.04 /bin/bash
 cd /dotfiles && ./install.sh
+```
+
+## CI Pipeline
+
+Every push to `main` and every PR triggers a three-stage pipeline in GitHub Actions:
+
+| Stage | What it does |
+|-------|-------------|
+| **Lint** | ShellCheck on all `.sh` files |
+| **Unit Tests** | Runs `tests/test-install.sh` (22 tests covering idempotency, symlinks, cross-platform skips, safety) |
+| **Integration** | Full `install.sh` end-to-end on the Codespaces base image, then verifies outcomes and re-runs for idempotency |
+
+All jobs run on `mcr.microsoft.com/devcontainers/universal` — the same base image used by GitHub Codespaces — for maximum parity with the real environment.
+
+**Running locally:**
+```bash
+# Unit tests
+bash tests/test-install.sh
+
+# Lint (requires shellcheck)
+shellcheck install.sh scripts/*.sh tests/*.sh
 ```
 
 ## Troubleshooting
