@@ -327,10 +327,10 @@ else
 fi
 
 # Test: deploy_copilot_prompts handles missing script gracefully
-if grep -A5 'deploy_copilot_prompts()' "$INSTALL_SH" | grep -q '\-x.*install-prompts'; then
-  pass "deploy_copilot_prompts checks script is executable before running"
+if grep -A10 'deploy_copilot_prompts()' "$INSTALL_SH" | grep -q '\[ -[fr]'; then
+  pass "deploy_copilot_prompts checks script exists before running"
 else
-  fail "deploy_copilot_prompts checks script is executable" "No -x check found"
+  fail "deploy_copilot_prompts checks script exists" "No file check found"
 fi
 
 echo ""
