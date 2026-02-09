@@ -52,14 +52,15 @@ Priority-ordered checklist for evolving this dotfiles repository.
   - [x] Test re-running install.sh (idempotency) — covered by test suite
   - [ ] Test with missing dependencies (no curl, no git) — partial coverage
   
-- [x] **Dotfiles CI/CD** (GitHub Actions)
+- [x] **Dotfiles CI/CD** (GitHub Actions) — merged in PR #9
   - [x] Create `.github/workflows/ci.yml` with lint + test + integration jobs
   - [x] All jobs on `mcr.microsoft.com/devcontainers/universal` (Codespaces base image)
   - [x] ShellCheck linting on all `.sh` files
-  - [x] Run `tests/test-install.sh` unit tests
+  - [x] Run `tests/test-install.sh` unit tests (23 tests)
   - [x] Full `install.sh` integration test in container
   - [x] Trigger on push to `main` and PRs
   - [x] Fix ShellCheck warnings in existing scripts
+  - [x] PR review feedback: safer `.bak` handling, decoupled test fixtures, doc alignment
   - [ ] TODO: Add `macos-latest` runner job (do NOT implement yet)
    
 - [ ] **Add troubleshooting guide**
