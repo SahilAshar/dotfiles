@@ -22,12 +22,12 @@ ERRORS=()
 # ── Helpers ──────────────────────────────────────────────────
 
 pass() {
-  ((PASS++))
+  PASS=$((PASS + 1))
   echo "  ✓ $1"
 }
 
 fail() {
-  ((FAIL++))
+  FAIL=$((FAIL + 1))
   ERRORS+=("$1: $2")
   echo "  ✗ $1"
   echo "    → $2"
