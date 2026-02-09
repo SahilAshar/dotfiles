@@ -199,6 +199,7 @@ Priority-ordered checklist for evolving this dotfiles repository.
 - [x] **Simplify install-prompts.sh**
   - [x] Rewrote to discover agents/skills in `.github/` instead of referencing deleted prompts
   - [ ] Consider: Should agents/skills be deployed globally (`~/.copilot/`) in future?
+  - [ ] If so, implement symlink/copy from `.github/agents/` and `.github/skills/` to `~/.copilot/`
 
 ## Notes
 - This TODO is a living document - update as priorities shift

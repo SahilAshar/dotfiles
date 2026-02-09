@@ -160,13 +160,13 @@ This repo contains **personal, universal** configuration. For work environments,
 1. Codespaces clones this repo to `/workspaces/.codespaces/.persistedshare/dotfiles`
 2. Automatically runs `./install.sh`
 3. Script installs packages, configures shell, symlinks config files
-4. Universal agents/skills deploy to `~/.copilot/` (global scope)
+4. Universal agents/skills are auto-discovered by Copilot from the repo's `.github/` directory
 
 ### On Local Mac
 
 1. Manually clone and run `./install.sh`
 2. Script detects macOS, skips apt packages gracefully
-3. Same shell configuration and agent deployment as Codespaces
+3. Same shell configuration as Codespaces (agents/skills available when working in dotfiles repo)
 
 ### Configuration Management
 
@@ -253,7 +253,7 @@ shellcheck install.sh scripts/*.sh tests/*.sh
 
 ### Agents/skills not appearing in Copilot
 
-1. Check `~/.copilot/agents/` and `~/.copilot/skills/` exist
+1. Agents/skills are auto-discovered from `.github/agents/` and `.github/skills/` when working in this repo
 2. Reload VS Code window: `Cmd+Shift+P` → "Reload Window"
 3. Check Copilot status: `@workspace /help`
 4. Wait 5-10 minutes for indexing
