@@ -2,6 +2,62 @@
 
 Priority-ordered checklist for evolving this dotfiles repository.
 
+## Tomorrow: Work Setup (2026-02-09)
+
+### Universal Skills (Personal Dotfiles)
+- [ ] **PR generation skill** (`.github/skills/pr-generation/SKILL.md`)
+  - [ ] Create PR from current branch state
+  - [ ] Auto-generate title and description from commits/diffs
+  - [ ] Include testing evidence and deployment notes
+  - [ ] Template structure for consistency
+
+- [ ] **TDD bug fixing skill** (`.github/skills/tdd-bug-fix/SKILL.md`)
+  - [ ] Write failing test that reproduces bug
+  - [ ] Implement minimal fix
+  - [ ] Verify test passes
+  - [ ] Include regression test patterns
+
+- [ ] **Git worktree skill** (`.github/skills/git-worktree/SKILL.md`)
+  - [ ] Set up parallel worktrees for concurrent work
+  - [ ] Best practices for worktree organization
+  - [ ] Clean up stale worktrees
+  - [ ] Integration with PR workflows
+
+- [ ] **Context management skill** (`.github/skills/context-management/SKILL.md`)
+  - [ ] Strategies for keeping agent context relevant
+  - [ ] When to summarize vs when to preserve detail
+  - [ ] Managing large codebases efficiently
+  - [ ] Token budget awareness
+
+### Enterprise Shim Repo Setup (Work)
+- [ ] **Create enterprise dotfiles shim repo structure**
+  - [ ] `install.sh` that clones personal dotfiles first
+  - [ ] Run personal `install.sh`, then layer enterprise config
+  - [ ] Document in shim README: personal → enterprise boundary
+
+- [ ] **Enterprise-specific skills** (in shim repo)
+  - [ ] Internal documentation integration skill (uses work MCP servers)
+  - [ ] Internal GitHub access patterns skill
+  - [ ] Enterprise Codespaces setup best practices skill
+  - [ ] Makefile-aware workflows skill (for cookiecutter repos)
+
+- [ ] **Enterprise CI setup** (in shim repo)
+  - [ ] `.github/workflows/ci.yml` using internal Codespaces images
+  - [ ] Same structure as personal dotfiles (lint + test + integration)
+  - [ ] Test against internal base image, not public universal image
+
+- [ ] **MCP server configurations** (in shim repo)
+  - [ ] Document which MCP servers are available
+  - [ ] Create example agent that uses work MCP servers
+  - [ ] Test MCP server connectivity in CI
+
+### Validation
+- [ ] Clone personal dotfiles to work machine
+- [ ] Verify all universal skills load correctly
+- [ ] Set up enterprise shim repo
+- [ ] Test full install flow (personal + enterprise layering)
+- [ ] Create one workspace-specific agent manually to validate approach
+
 ## High Priority (Do First)
 
 ### P0: Critical Cleanup
