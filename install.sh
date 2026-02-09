@@ -40,7 +40,7 @@ install_apt_packages() {
   fi
 
   # Read packages, skip comments/blank lines
-  mapfile -t apt_packages < <(sed -e 's/#.*//' -e 's/^[[:space:]]*//' -e '/^$/d' "$APT_PACKAGES_FILE")
+  mapfile -t apt_packages < <(sed -e 's/#.*//' -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' -e '/^$/d' "$APT_PACKAGES_FILE")
   
   if [ "${#apt_packages[@]}" -eq 0 ]; then
     echo "→ No packages listed in $APT_PACKAGES_FILE"
@@ -168,6 +168,11 @@ link_file() {
   # Backup existing file/symlink if present
   if [ -L "$dest" ] || [ -e "$dest" ]; then
     local backup="$dest.bak"
+    if [ -e "$backup" ]; then
+      echo "✗ ERROR: Backup already exists: $backup" >&2
+      echo "  Resolve manually before re-running." >&2
+      exit 1
+    fi
     echo "→ Backing up existing file: $dest → $backup"
     mv "$dest" "$backup"
   fi

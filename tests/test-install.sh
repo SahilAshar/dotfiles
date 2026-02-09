@@ -67,13 +67,25 @@ echo ""
 
 echo "Package file parsing"
 
+# Create a temporary fixture to test parsing logic without coupling to repo contents
+FIXTURE_DIR=$(mktemp -d)
+trap 'rm -rf "$FIXTURE_DIR"' EXIT
+cat > "$FIXTURE_DIR/apt-packages.txt" <<'EOF'
+# Core tools
+zsh
+  ripgrep   
+
+# Commented out
+# htop
+EOF
+
 # Test: Reads packages correctly (skipping comments and blanks)
-packages=$(sed -e 's/#.*//' -e 's/^[[:space:]]*//' -e '/^$/d' "$REPO_ROOT/apt-packages.txt")
+packages=$(sed -e 's/#.*//' -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' -e '/^$/d' "$FIXTURE_DIR/apt-packages.txt")
 expected=$'zsh\nripgrep'
 if [ "$packages" = "$expected" ]; then
-  pass "Parses apt-packages.txt correctly (got: zsh, ripgrep)"
+  pass "Parses package file correctly (strips comments, blanks, whitespace)"
 else
-  fail "Parses apt-packages.txt correctly" "Got '$packages'"
+  fail "Parses package file correctly" "Got '$packages'"
 fi
 
 # Test: Array iteration uses values, not count
@@ -82,7 +94,7 @@ fi
 iterated=()
 while IFS= read -r pkg; do
   [ -n "$pkg" ] && iterated+=("$pkg")
-done < <(sed -e 's/#.*//' -e 's/^[[:space:]]*//' -e '/^$/d' "$REPO_ROOT/apt-packages.txt" && printf '\n')
+done < <(sed -e 's/#.*//' -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' -e '/^$/d' "$FIXTURE_DIR/apt-packages.txt" && printf '\n')
 
 if [ "${#iterated[@]}" -eq 2 ] && [ "${iterated[0]}" = "zsh" ] && [ "${iterated[1]}" = "ripgrep" ]; then
   pass "Array iteration yields package names"
@@ -169,7 +181,12 @@ link_file() {
     return
   fi
   if [ -L "$dest" ] || [ -e "$dest" ]; then
-    mv "$dest" "$dest.bak"
+    local backup="$dest.bak"
+    if [ -e "$backup" ]; then
+      echo "ERROR: Backup already exists: $backup" >&2
+      return 1
+    fi
+    mv "$dest" "$backup"
     echo "BACKED_UP"
   fi
   mkdir -p "$(dirname "$dest")"
@@ -181,6 +198,7 @@ case "$ACTION" in
   create)    link_file "zsh/.zshrc" ".zshrc" ;;
   idempotent) link_file "zsh/.zshrc" ".zshrc" ;;
   backup)    echo "original" > "$HOME/.target"; link_file "zsh/.zshrc" ".target" ;;
+  backup_exists) echo "original" > "$HOME/.target2"; echo "old" > "$HOME/.target2.bak"; link_file "zsh/.zshrc" ".target2" ;;
   missing)   link_file "nonexistent" ".test" ;;
 esac
 SCRIPT
@@ -213,6 +231,17 @@ if [ -f "$FAKE_HOME/.target.bak" ] && echo "$output" | grep -q "BACKED_UP"; then
   pass "Backs up existing file before symlinking"
 else
   fail "Backs up existing file" "No backup created or wrong output: $output"
+fi
+
+# Test: Refuses to overwrite existing backup
+set +e
+output=$(bash "$SANDBOX/test_link.sh" "$FAKE_DOTFILES" "$FAKE_HOME" backup_exists 2>&1)
+exit_code=$?
+set -e
+if [ "$exit_code" -ne 0 ] && echo "$output" | grep -q "Backup already exists"; then
+  pass "Refuses to overwrite existing .bak file"
+else
+  fail "Refuses to overwrite existing .bak file" "exit=$exit_code, output: $output"
 fi
 
 # Test: Errors on missing source file
