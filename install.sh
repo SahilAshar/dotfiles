@@ -189,11 +189,13 @@ link_file() {
 deploy_copilot_prompts() {
   echo ""
   echo "→ Deploying Copilot prompts/agents/skills..."
-  
-  if [ -x "$DOTFILES_DIR/scripts/install-prompts.sh" ]; then
-    "$DOTFILES_DIR/scripts/install-prompts.sh"
+
+  local prompts_installer="$DOTFILES_DIR/scripts/install-prompts.sh"
+
+  if [ -f "$prompts_installer" ] && [ -r "$prompts_installer" ]; then
+    bash "$prompts_installer"
   else
-    echo "⚠ Warning: scripts/install-prompts.sh not found or not executable" >&2
+    echo "⚠ Warning: scripts/install-prompts.sh is missing or not readable; skipping Copilot prompt deployment" >&2
   fi
 }
 
