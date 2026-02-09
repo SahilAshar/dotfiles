@@ -1,0 +1,65 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint:
+    name: ShellCheck Lint
+    runs-on: ubuntu-latest
+    container:
+      image: mcr.microsoft.com/devcontainers/universal:latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install ShellCheck
+        run: apt-get update -qq && apt-get install -y -qq shellcheck
+
+      - name: Lint all shell scripts
+        run: shellcheck install.sh scripts/*.sh tests/*.sh
+
+  test:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    container:
+      image: mcr.microsoft.com/devcontainers/universal:latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run test suite
+        run: bash tests/test-install.sh
+
+  integration:
+    name: Integration Test
+    needs: [lint, test]
+    runs-on: ubuntu-latest
+    container:
+      image: mcr.microsoft.com/devcontainers/universal:latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run install.sh end-to-end
+        run: ./install.sh
+
+      - name: Verify zsh is available
+        run: command -v zsh
+
+      - name: Verify Oh My Zsh installed
+        run: test -d "$HOME/.oh-my-zsh"
+
+      - name: Verify Powerlevel10k installed
+        run: test -d "$HOME/.oh-my-zsh/custom/themes/powerlevel10k"
+
+      - name: Verify zsh-autosuggestions installed
+        run: test -d "$HOME/.oh-my-zsh/custom/plugins/zsh-autosuggestions"
+
+      - name: Verify .zshrc symlink
+        run: |
+          test -L "$HOME/.zshrc"
+          readlink "$HOME/.zshrc" | grep -q "zsh/.zshrc"
+
+      - name: Verify install is idempotent
+        run: ./install.sh
