@@ -174,6 +174,7 @@ All configuration lives in this repo, symlinked into `$HOME`:
 - `~/.zshrc` → `dotfiles/zsh/.zshrc`
 - `~/.p10k.zsh` → `dotfiles/zsh/.p10k.zsh`
 - `~/.gitconfig` → `dotfiles/git/.gitconfig`
+- `~/.vscode/settings.json` → `dotfiles/vscode/settings.json`
 
 **Why symlinks?** Changes to dotfiles repo immediately reflect in active environment. No sync needed. One source of truth.
 
@@ -209,7 +210,7 @@ See [`.github/skills/readability/SKILL.md`](.github/skills/readability/SKILL.md)
 ## Development Workflow
 
 1. **Make changes** - Edit files in this repo
-2. **Run tests locally** - `bash tests/test-install.sh` (22 unit tests)
+2. **Run tests locally** - `bash tests/test-install.sh`
 3. **Lint** - `shellcheck install.sh scripts/*.sh tests/*.sh`
 4. **Commit and push** - CI runs automatically on PRs to `main`
 5. **Test in fresh Codespace** - Create new Codespace, verify everything works
@@ -228,7 +229,7 @@ Every push to `main` and every PR triggers a three-stage pipeline in GitHub Acti
 | Stage | What it does |
 |-------|-------------|
 | **Lint** | ShellCheck on all `.sh` files |
-| **Unit Tests** | Runs `tests/test-install.sh` (22 tests covering idempotency, symlinks, cross-platform skips, safety) |
+| **Unit Tests** | Runs `tests/test-install.sh` (covers idempotency, symlinks, cross-platform skips, safety) |
 | **Integration** | Full `install.sh` end-to-end on the Codespaces base image, then verifies outcomes and re-runs for idempotency |
 
 All jobs run on `mcr.microsoft.com/devcontainers/universal` — the same base image used by GitHub Codespaces — for maximum parity with the real environment.

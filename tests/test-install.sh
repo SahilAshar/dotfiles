@@ -63,7 +63,18 @@ fi
 
 echo ""
 
-# ── 2. apt package parsing ──────────────────────────────────
+# ── 2. Installer wiring (static analysis) ───────────────────
+
+echo "Linking behavior tests"
+
+# Test: install.sh links git config when template exists
+if grep -q 'link_file "git/.gitconfig" ".gitconfig"' "$INSTALL_SH"; then
+  pass "Links git/.gitconfig into home when present"
+else
+  fail "Links git/.gitconfig into home when present" "Missing git config symlink call"
+fi
+
+# ── 3. apt package parsing ──────────────────────────────────
 
 echo "Package file parsing"
 
@@ -116,7 +127,7 @@ fi
 
 echo ""
 
-# ── 3. Graceful skips (cross-platform) ──────────────────────
+# ── 4. Graceful skips (cross-platform) ──────────────────────
 
 echo "Cross-platform graceful skips"
 
@@ -151,7 +162,7 @@ fi
 
 echo ""
 
-# ── 4. Symlink behavior (link_file) ─────────────────────────
+# ── 5. Symlink behavior (link_file) ─────────────────────────
 
 echo "Symlink behavior (link_file)"
 
@@ -259,7 +270,7 @@ rm -rf "$SANDBOX"
 
 echo ""
 
-# ── 5. Idempotency guards (static analysis) ─────────────────
+# ── 6. Idempotency guards (static analysis) ─────────────────
 
 echo "Idempotency guards"
 
@@ -307,7 +318,7 @@ fi
 
 echo ""
 
-# ── 6. Script safety ────────────────────────────────────────
+# ── 7. Script safety ────────────────────────────────────────
 
 echo "Script safety"
 
@@ -331,6 +342,27 @@ if grep -A10 'deploy_copilot_prompts()' "$INSTALL_SH" | grep -q '\[ -[fr]'; then
   pass "deploy_copilot_prompts checks script exists before running"
 else
   fail "deploy_copilot_prompts checks script exists" "No file check found"
+fi
+
+# Test: Does not allow insecure apt repositories globally
+if grep -q 'Acquire::AllowInsecureRepositories=true' "$INSTALL_SH"; then
+  fail "Does not allow insecure apt repositories globally" "Found Acquire::AllowInsecureRepositories=true"
+else
+  pass "Does not allow insecure apt repositories globally"
+fi
+
+# Test: Does not allow downgrade to insecure repositories
+if grep -q 'Acquire::AllowDowngradeToInsecureRepositories=true' "$INSTALL_SH"; then
+  fail "Does not allow downgrade to insecure repositories" "Found Acquire::AllowDowngradeToInsecureRepositories=true"
+else
+  pass "Does not allow downgrade to insecure repositories"
+fi
+
+# Test: Includes targeted workaround for broken yarn source
+if grep -q 'disable_broken_yarn_apt_source' "$INSTALL_SH" && grep -q 'dl.yarnpkg.com' "$INSTALL_SH"; then
+  pass "Has targeted yarn apt source recovery logic"
+else
+  fail "Has targeted yarn apt source recovery logic" "Missing helper function or yarn source detection"
 fi
 
 echo ""
