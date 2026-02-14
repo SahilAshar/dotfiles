@@ -1,0 +1,23 @@
+[init]
+	defaultBranch = main
+
+[pull]
+	ff = only
+
+[push]
+	autoSetupRemote = true
+
+[fetch]
+	prune = true
+
+[rebase]
+	autoStash = true
+
+[rerere]
+	enabled = true
+
+[core]
+	autocrlf = input
+
+[color]
+	ui = auto

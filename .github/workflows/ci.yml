@@ -5,6 +5,9 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
+  schedule:
+    # Run nightly at 2 AM UTC to catch upstream image issues
+    - cron: '0 2 * * *'
 
 jobs:
   lint:

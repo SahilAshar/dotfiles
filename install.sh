@@ -25,6 +25,35 @@ echo "Dotfiles dir: $DOTFILES_DIR"
 if [ -n "${CODESPACES:-}" ]; then echo "Environment: Codespaces"; else echo "Environment: Local"; fi
 echo ""
 
+run_as_root() {
+  if command -v sudo >/dev/null 2>&1 && [ "$EUID" -ne 0 ]; then
+    sudo "$@"
+  else
+    "$@"
+  fi
+}
+
+disable_broken_yarn_apt_source() {
+  local source_file
+
+  for source_file in /etc/apt/sources.list.d/*.list /etc/apt/sources.list.d/*.sources; do
+    [ -f "$source_file" ] || continue
+
+    if grep -qi "dl.yarnpkg.com" "$source_file"; then
+      local disabled_file="${source_file}.disabled-by-dotfiles"
+
+      # Idempotent: if we've already disabled it, don't do it again.
+      if [ -f "$disabled_file" ]; then
+        continue
+      fi
+
+      run_as_root mv "$source_file" "$disabled_file"
+
+      echo "→ Disabled broken yarn apt source: $source_file"
+    fi
+  done
+}
+
 # Install apt packages (Linux/Codespaces only)
 install_apt_packages() {
   # Skip if no package file
@@ -41,7 +70,7 @@ install_apt_packages() {
 
   # Read packages, skip comments/blank lines
   mapfile -t apt_packages < <(sed -e 's/#.*//' -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' -e '/^$/d' "$APT_PACKAGES_FILE")
-  
+
   if [ "${#apt_packages[@]}" -eq 0 ]; then
     echo "→ No packages listed in $APT_PACKAGES_FILE"
     return
@@ -61,16 +90,29 @@ install_apt_packages() {
   fi
 
   echo "→ Installing apt packages: ${missing_packages[*]}"
-  
-  # Use sudo if available and not root
-  if command -v sudo >/dev/null 2>&1 && [ "$EUID" -ne 0 ]; then
-    sudo apt-get update -qq
-    sudo apt-get install -y -qq "${missing_packages[@]}"
-  else
-    apt-get update -qq
-    apt-get install -y -qq "${missing_packages[@]}"
+
+  local apt_update_output
+  if ! apt_update_output="$(run_as_root apt-get update -qq 2>&1)"; then
+    echo "$apt_update_output" >&2
+
+    # Best-effort repair for a known transient issue in some universal image variants.
+    if echo "$apt_update_output" | grep -q "dl.yarnpkg.com"; then
+      echo "⚠ Detected broken yarn apt source in base image; disabling it and retrying apt-get update"
+      disable_broken_yarn_apt_source || true
+      local retry_apt_update_output
+      if ! retry_apt_update_output="$(run_as_root apt-get update -qq 2>&1)"; then
+        echo "$retry_apt_update_output" >&2
+        echo "✗ ERROR: apt-get update failed after disabling broken yarn apt source" >&2
+        exit 1
+      fi
+    else
+      echo "✗ ERROR: apt-get update failed" >&2
+      exit 1
+    fi
   fi
-  
+
+  run_as_root apt-get install -y -qq "${missing_packages[@]}"
+
   echo "✓ Packages installed"
 }
 
@@ -87,16 +129,16 @@ install_ohmyzsh() {
   fi
 
   echo "→ Installing Oh My Zsh..."
-  
+
   # Don't start new shell, don't overwrite existing .zshrc
   export RUNZSH=no
   export KEEP_ZSHRC=yes
-  
+
   sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" || {
     echo "✗ Oh My Zsh installation failed" >&2
     exit 1
   }
-  
+
   echo "✓ Oh My Zsh installed"
 }
 
@@ -121,14 +163,14 @@ install_powerlevel10k() {
     echo "✗ Powerlevel10k installation failed" >&2
     exit 1
   }
-  
+
   echo "✓ Powerlevel10k installed"
 }
 
 # Install zsh-autosuggestions plugin (if missing)
 install_zsh_autosuggestions() {
   local plugin_dir="$HOME/.oh-my-zsh/custom/plugins/zsh-autosuggestions"
-  
+
   if [ -d "$plugin_dir" ]; then
     echo "✓ zsh-autosuggestions already installed"
     return
@@ -144,7 +186,7 @@ install_zsh_autosuggestions() {
     echo "✗ zsh-autosuggestions installation failed" >&2
     exit 1
   }
-  
+
   echo "✓ zsh-autosuggestions installed"
 }
 
@@ -179,7 +221,7 @@ link_file() {
 
   # Create parent directory if needed
   mkdir -p "$(dirname "$dest")"
-  
+
   # Create symlink
   ln -s "$src" "$dest"
   echo "✓ Linked: $dest → $src"
@@ -203,34 +245,39 @@ deploy_copilot_prompts() {
 main() {
   echo "Starting installation..."
   echo ""
-  
+
   install_apt_packages
   echo ""
-  
+
   install_ohmyzsh
   echo ""
-  
+
   install_powerlevel10k
   echo ""
-  
+
   install_zsh_autosuggestions
   echo ""
-  
+
   echo "→ Linking shell configuration files..."
   link_file "zsh/.zshrc" ".zshrc"
-  
+
   if [ -f "$DOTFILES_DIR/zsh/.p10k.zsh" ]; then
     link_file "zsh/.p10k.zsh" ".p10k.zsh"
   fi
+
+  if [ -f "$DOTFILES_DIR/git/.gitconfig" ]; then
+    link_file "git/.gitconfig" ".gitconfig"
+  fi
+
   echo ""
-  
+
   deploy_copilot_prompts
   echo ""
-  
+
   echo "=============================="
   echo "✓ Installation complete!"
   echo "=============================="
-  
+
   if [ -z "${CODESPACES:-}" ]; then
     echo ""
     echo "Next steps:"
