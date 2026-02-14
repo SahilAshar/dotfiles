@@ -25,6 +25,31 @@ echo "Dotfiles dir: $DOTFILES_DIR"
 if [ -n "${CODESPACES:-}" ]; then echo "Environment: Codespaces"; else echo "Environment: Local"; fi
 echo ""
 
+disable_broken_yarn_apt_source() {
+  local source_file
+
+  for source_file in /etc/apt/sources.list.d/*.list /etc/apt/sources.list.d/*.sources; do
+    [ -f "$source_file" ] || continue
+
+    if grep -qi "dl.yarnpkg.com" "$source_file"; then
+      local disabled_file="${source_file}.disabled-by-dotfiles"
+
+      # Idempotent: if we've already disabled it, don't do it again.
+      if [ -f "$disabled_file" ]; then
+        continue
+      fi
+
+      if command -v sudo >/dev/null 2>&1 && [ "$EUID" -ne 0 ]; then
+        sudo mv "$source_file" "$disabled_file"
+      else
+        mv "$source_file" "$disabled_file"
+      fi
+
+      echo "→ Disabled broken yarn apt source: $source_file"
+    fi
+  done
+}
+
 # Install apt packages (Linux/Codespaces only)
 install_apt_packages() {
   # Skip if no package file
@@ -63,11 +88,45 @@ install_apt_packages() {
   echo "→ Installing apt packages: ${missing_packages[*]}"
   
   # Use sudo if available and not root
+  local use_sudo=false
   if command -v sudo >/dev/null 2>&1 && [ "$EUID" -ne 0 ]; then
-    sudo apt-get update -qq
+    use_sudo=true
+  fi
+
+  local apt_update_output
+  if [ "$use_sudo" = true ]; then
+    if ! apt_update_output="$(sudo apt-get update -qq 2>&1)"; then
+      echo "$apt_update_output" >&2
+
+      # Best-effort repair for a known transient issue in some universal image variants.
+      if echo "$apt_update_output" | grep -q "dl.yarnpkg.com"; then
+        echo "⚠ Detected broken yarn apt source in base image; disabling it and retrying apt-get update"
+        disable_broken_yarn_apt_source || true
+        sudo apt-get update -qq
+      else
+        echo "✗ ERROR: apt-get update failed" >&2
+        exit 1
+      fi
+    fi
+  else
+    if ! apt_update_output="$(apt-get update -qq 2>&1)"; then
+      echo "$apt_update_output" >&2
+
+      # Best-effort repair for a known transient issue in some universal image variants.
+      if echo "$apt_update_output" | grep -q "dl.yarnpkg.com"; then
+        echo "⚠ Detected broken yarn apt source in base image; disabling it and retrying apt-get update"
+        disable_broken_yarn_apt_source || true
+        apt-get update -qq
+      else
+        echo "✗ ERROR: apt-get update failed" >&2
+        exit 1
+      fi
+    fi
+  fi
+
+  if [ "$use_sudo" = true ]; then
     sudo apt-get install -y -qq "${missing_packages[@]}"
   else
-    apt-get update -qq
     apt-get install -y -qq "${missing_packages[@]}"
   fi
   
