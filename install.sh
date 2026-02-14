@@ -70,7 +70,7 @@ install_apt_packages() {
 
   # Read packages, skip comments/blank lines
   mapfile -t apt_packages < <(sed -e 's/#.*//' -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' -e '/^$/d' "$APT_PACKAGES_FILE")
-  
+
   if [ "${#apt_packages[@]}" -eq 0 ]; then
     echo "→ No packages listed in $APT_PACKAGES_FILE"
     return
@@ -90,7 +90,7 @@ install_apt_packages() {
   fi
 
   echo "→ Installing apt packages: ${missing_packages[*]}"
-  
+
   local apt_update_output
   if ! apt_update_output="$(run_as_root apt-get update -qq 2>&1)"; then
     echo "$apt_update_output" >&2
@@ -99,7 +99,12 @@ install_apt_packages() {
     if echo "$apt_update_output" | grep -q "dl.yarnpkg.com"; then
       echo "⚠ Detected broken yarn apt source in base image; disabling it and retrying apt-get update"
       disable_broken_yarn_apt_source || true
-      run_as_root apt-get update -qq
+      local retry_apt_update_output
+      if ! retry_apt_update_output="$(run_as_root apt-get update -qq 2>&1)"; then
+        echo "$retry_apt_update_output" >&2
+        echo "✗ ERROR: apt-get update failed after disabling broken yarn apt source" >&2
+        exit 1
+      fi
     else
       echo "✗ ERROR: apt-get update failed" >&2
       exit 1
@@ -107,7 +112,7 @@ install_apt_packages() {
   fi
 
   run_as_root apt-get install -y -qq "${missing_packages[@]}"
-  
+
   echo "✓ Packages installed"
 }
 
@@ -124,16 +129,16 @@ install_ohmyzsh() {
   fi
 
   echo "→ Installing Oh My Zsh..."
-  
+
   # Don't start new shell, don't overwrite existing .zshrc
   export RUNZSH=no
   export KEEP_ZSHRC=yes
-  
+
   sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" || {
     echo "✗ Oh My Zsh installation failed" >&2
     exit 1
   }
-  
+
   echo "✓ Oh My Zsh installed"
 }
 
@@ -158,14 +163,14 @@ install_powerlevel10k() {
     echo "✗ Powerlevel10k installation failed" >&2
     exit 1
   }
-  
+
   echo "✓ Powerlevel10k installed"
 }
 
 # Install zsh-autosuggestions plugin (if missing)
 install_zsh_autosuggestions() {
   local plugin_dir="$HOME/.oh-my-zsh/custom/plugins/zsh-autosuggestions"
-  
+
   if [ -d "$plugin_dir" ]; then
     echo "✓ zsh-autosuggestions already installed"
     return
@@ -181,7 +186,7 @@ install_zsh_autosuggestions() {
     echo "✗ zsh-autosuggestions installation failed" >&2
     exit 1
   }
-  
+
   echo "✓ zsh-autosuggestions installed"
 }
 
@@ -216,7 +221,7 @@ link_file() {
 
   # Create parent directory if needed
   mkdir -p "$(dirname "$dest")"
-  
+
   # Create symlink
   ln -s "$src" "$dest"
   echo "✓ Linked: $dest → $src"
@@ -240,22 +245,22 @@ deploy_copilot_prompts() {
 main() {
   echo "Starting installation..."
   echo ""
-  
+
   install_apt_packages
   echo ""
-  
+
   install_ohmyzsh
   echo ""
-  
+
   install_powerlevel10k
   echo ""
-  
+
   install_zsh_autosuggestions
   echo ""
-  
+
   echo "→ Linking shell configuration files..."
   link_file "zsh/.zshrc" ".zshrc"
-  
+
   if [ -f "$DOTFILES_DIR/zsh/.p10k.zsh" ]; then
     link_file "zsh/.p10k.zsh" ".p10k.zsh"
   fi
@@ -265,14 +270,14 @@ main() {
   fi
 
   echo ""
-  
+
   deploy_copilot_prompts
   echo ""
-  
+
   echo "=============================="
   echo "✓ Installation complete!"
   echo "=============================="
-  
+
   if [ -z "${CODESPACES:-}" ]; then
     echo ""
     echo "Next steps:"
