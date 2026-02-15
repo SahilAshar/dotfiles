@@ -68,7 +68,7 @@ echo ""
 echo "Linking behavior tests"
 
 # Test: install.sh links git config when template exists
-if grep -q 'link_file "git/.gitconfig" ".gitconfig"' "$INSTALL_SH"; then
+if grep -q 'link_file_into_home "git/.gitconfig" ".gitconfig"' "$INSTALL_SH"; then
   pass "Links git/.gitconfig into home when present"
 else
   fail "Links git/.gitconfig into home when present" "Missing git config symlink call"
@@ -295,11 +295,11 @@ else
   fail "zsh-autosuggestions: checks if already installed" "No directory check found"
 fi
 
-# Test: link_file checks for existing correct symlink
+# Test: link helper checks for existing correct symlink
 if grep -q 'readlink.*dest.*=.*src' "$INSTALL_SH"; then
-  pass "link_file: checks if symlink already correct"
+  pass "link_path: checks if symlink already correct"
 else
-  fail "link_file: checks if symlink already correct" "No readlink comparison found"
+  fail "link_path: checks if symlink already correct" "No readlink comparison found"
 fi
 
 # Test: RUNZSH=no prevents Oh My Zsh from launching interactive shell
@@ -338,10 +338,19 @@ else
 fi
 
 # Test: deploy_copilot_prompts handles missing script gracefully
-if grep -A10 'deploy_copilot_prompts()' "$INSTALL_SH" | grep -q '\[ -[fr]'; then
+if grep -A30 'deploy_copilot_prompts()' "$INSTALL_SH" | grep -q '\[ -[fr]'; then
   pass "deploy_copilot_prompts checks script exists before running"
 else
   fail "deploy_copilot_prompts checks script exists" "No file check found"
+fi
+
+# Test: deploy_copilot_prompts links dotfiles .github into ~/.github for global availability
+if grep -A30 'deploy_copilot_prompts()' "$INSTALL_SH" | grep -q 'github_source="\$DOTFILES_DIR/\.github"' \
+  && grep -A30 'deploy_copilot_prompts()' "$INSTALL_SH" | grep -q 'github_dest="\$HOME/\.github"' \
+  && grep -A30 'deploy_copilot_prompts()' "$INSTALL_SH" | grep -q 'link_path "\$github_source" "\$github_dest"'; then
+  pass "deploy_copilot_prompts links ~/.github for global Copilot assets"
+else
+  fail "deploy_copilot_prompts links ~/.github for global Copilot assets" "Missing .github source/destination/link call"
 fi
 
 # Test: Does not allow insecure apt repositories globally

@@ -9,6 +9,8 @@ Priority-ordered checklist for evolving this dotfiles repository.
   - [ ] Create PR from current branch state
   - [ ] Auto-generate title and description from commits/diffs
   - [ ] Include testing evidence and deployment notes
+  - [ ] Run `linting` skill first and include lint/fix summary in PR body
+  - [ ] Run `style-lint` skill and include style/readability notes in PR body
   - [ ] Template structure for consistency
 
 - [ ] **TDD bug fixing skill** (`.github/skills/tdd-bug-fix/SKILL.md`)
@@ -100,14 +102,14 @@ Priority-ordered checklist for evolving this dotfiles repository.
 
 ### P2: Documentation & Testing
 - [x] **Update README.md** with new philosophy
-  
+
 - [x] **Create testing checklist**
   - [x] Create `tests/test-install.sh` with 22 tests covering install.sh
   - [ ] Test fresh Codespace creation (manual)
   - [ ] Test local macOS install (manual)
   - [x] Test re-running install.sh (idempotency) — covered by test suite
   - [ ] Test with missing dependencies (no curl, no git) — partial coverage
-  
+
 - [x] **Dotfiles CI/CD** (GitHub Actions) — merged in PR #9
   - [x] Create `.github/workflows/ci.yml` with lint + test + integration jobs
   - [x] All jobs on `mcr.microsoft.com/devcontainers/universal` (Codespaces base image)
@@ -118,7 +120,7 @@ Priority-ordered checklist for evolving this dotfiles repository.
   - [x] Fix ShellCheck warnings in existing scripts
   - [x] PR review feedback: safer `.bak` handling, decoupled test fixtures, doc alignment
   - [ ] TODO: Add `macos-latest` runner job (do NOT implement yet)
-   
+
 - [ ] **Add troubleshooting guide**
   - [ ] Common errors and solutions
   - [ ] How to check logs in Codespaces
@@ -131,7 +133,7 @@ Priority-ordered checklist for evolving this dotfiles repository.
   - [ ] Add git aliases
   - [ ] Add commit message templates
   - [ ] Add merge/diff tools configuration
-  
+
 - [ ] **Enhance zsh configuration**
   - [ ] Add useful aliases
   - [ ] Add custom functions
@@ -148,7 +150,7 @@ Priority-ordered checklist for evolving this dotfiles repository.
   - [ ] `git-workflow` - Git best practices and patterns
   - [ ] `markdown-editing` - Markdown formatting standards
   - [ ] `documentation` - How to document code/repos
-  
+
 - [ ] **Create specialized agents for common tasks**
   - [ ] `config-reviewer` - Reviews dotfiles changes
   - [ ] `environment-debugger` - Helps debug shell/env issues
@@ -158,7 +160,7 @@ Priority-ordered checklist for evolving this dotfiles repository.
   - [ ] Better visual feedback during install
   - [ ] Estimated time remaining?
   - [ ] Spinners for long-running operations
-  
+
 - [ ] **Create quick-start script**
   - [ ] `bootstrap.sh` that curl-pipes for one-command install
   - [ ] Similar to felipecrs/dotfiles approach
@@ -252,7 +254,7 @@ Priority-ordered checklist for evolving this dotfiles repository.
 - [ ] **Audit current files**
   - [ ] Identify unused configurations
   - [ ] Remove or document "why kept but not used"
-  
+
 - [x] **Simplify install-prompts.sh**
   - [x] Rewrote to discover agents/skills in `.github/` instead of referencing deleted prompts
   - [ ] Consider: Should agents/skills be deployed globally (`~/.copilot/`) in future?

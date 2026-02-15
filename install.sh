@@ -190,11 +190,11 @@ install_zsh_autosuggestions() {
   echo "✓ zsh-autosuggestions installed"
 }
 
-# Link dotfiles into home directory
-# Args: relative_source_path target_filename
-link_file() {
-  local src="$DOTFILES_DIR/$1"
-  local dest="$HOME/$2"
+# Link source path to destination path with backup/idempotency behavior.
+# Args: source_path destination_path
+link_path() {
+  local src="$1"
+  local dest="$2"
 
   if [ ! -e "$src" ]; then
     echo "✗ ERROR: Source file does not exist: $src" >&2
@@ -227,10 +227,27 @@ link_file() {
   echo "✓ Linked: $dest → $src"
 }
 
+# Link dotfiles into home directory
+# Args: relative_source_path target_filename
+link_file_into_home() {
+  local src="$DOTFILES_DIR/$1"
+  local dest="$HOME/$2"
+  link_path "$src" "$dest"
+}
+
 # Deploy Copilot prompts to VS Code
 deploy_copilot_prompts() {
   echo ""
   echo "→ Deploying Copilot prompts/agents/skills..."
+
+  local github_source="$DOTFILES_DIR/.github"
+  local github_dest="$HOME/.github"
+
+  if [ -d "$github_source" ]; then
+    link_path "$github_source" "$github_dest"
+  else
+    echo "⚠ Warning: .github directory not found in dotfiles repo; skipping global Copilot assets link" >&2
+  fi
 
   local prompts_installer="$DOTFILES_DIR/scripts/install-prompts.sh"
 
@@ -259,14 +276,14 @@ main() {
   echo ""
 
   echo "→ Linking shell configuration files..."
-  link_file "zsh/.zshrc" ".zshrc"
+  link_file_into_home "zsh/.zshrc" ".zshrc"
 
   if [ -f "$DOTFILES_DIR/zsh/.p10k.zsh" ]; then
-    link_file "zsh/.p10k.zsh" ".p10k.zsh"
+    link_file_into_home "zsh/.p10k.zsh" ".p10k.zsh"
   fi
 
   if [ -f "$DOTFILES_DIR/git/.gitconfig" ]; then
-    link_file "git/.gitconfig" ".gitconfig"
+    link_file_into_home "git/.gitconfig" ".gitconfig"
   fi
 
   echo ""
