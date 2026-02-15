@@ -19,7 +19,7 @@ When you create a Codespace with this dotfiles repo configured:
 
 1. **Installs packages** - `zsh`, `ripgrep`, and other essentials (Linux only)
 2. **Configures shell** - Sets up zsh with Oh My Zsh, Powerlevel10k theme, and autosuggestions
-3. **Links configurations** - Symlinks `.zshrc`, `.p10k.zsh`, `.gitconfig`, VS Code settings
+3. **Links configurations** - Symlinks `.zshrc`, `.p10k.zsh`, `.gitconfig`, and VS Code settings
 4. **Deploys agentic workflows** - Installs universal Copilot agents and skills
 
 **Total time**: ~30 seconds on a fresh Codespace.  

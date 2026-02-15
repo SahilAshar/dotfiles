@@ -74,6 +74,27 @@ else
   fail "Links git/.gitconfig into home when present" "Missing git config symlink call"
 fi
 
+# Test: install.sh links VS Code settings with environment-specific paths
+if grep -q 'link_file "vscode/settings.json"' "$INSTALL_SH"; then
+  pass "Links VS Code settings with environment detection"
+else
+  fail "Links VS Code settings with environment detection" "Missing VS Code settings symlink call"
+fi
+
+# Test: VS Code settings uses correct path for Codespaces
+if grep -q '.vscode-server/data/Machine/settings.json' "$INSTALL_SH"; then
+  pass "VS Code settings path correct for Codespaces"
+else
+  fail "VS Code settings path correct for Codespaces" "Missing Codespaces VS Code path"
+fi
+
+# Test: VS Code settings uses correct path for macOS
+if grep -q 'Library/Application Support/Code/User/settings.json' "$INSTALL_SH"; then
+  pass "VS Code settings path correct for macOS"
+else
+  fail "VS Code settings path correct for macOS" "Missing macOS VS Code path"
+fi
+
 # ── 3. apt package parsing ──────────────────────────────────
 
 echo "Package file parsing"
