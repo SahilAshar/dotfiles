@@ -79,7 +79,7 @@ Priority-ordered checklist for evolving this dotfiles repository.
     - [x] Codespaces: `~/.vscode-server/data/Machine/settings.json`
     - [x] macOS: `~/Library/Application Support/Code/User/settings.json`
     - [x] Linux: `~/.config/Code/User/settings.json`
-  - [x] Add tests for VS Code settings symlinking (30 tests passing)
+  - [x] Add tests for VS Code settings symlinking (31 tests passing)
   - [ ] Create `vscode/keybindings.json` if needed (defer - not critical)
   - [ ] Test in fresh Codespace (manual validation needed)
 
@@ -107,7 +107,7 @@ Priority-ordered checklist for evolving this dotfiles repository.
 - [x] **Update README.md** with new philosophy
   
 - [x] **Create testing checklist**
-  - [x] Create `tests/test-install.sh` with 30 tests covering install.sh (updated 2026-02-15)
+  - [x] Create `tests/test-install.sh` with 31 tests covering install.sh (updated 2026-02-15)
   - [ ] Test fresh Codespace creation (manual)
   - [ ] Test local macOS install (manual)
   - [x] Test re-running install.sh (idempotency) — covered by test suite
@@ -117,7 +117,7 @@ Priority-ordered checklist for evolving this dotfiles repository.
   - [x] Create `.github/workflows/ci.yml` with lint + test + integration jobs
   - [x] All jobs on `mcr.microsoft.com/devcontainers/universal` (Codespaces base image)
   - [x] ShellCheck linting on all `.sh` files
-  - [x] Run `tests/test-install.sh` unit tests (30 tests)
+  - [x] Run `tests/test-install.sh` unit tests (31 tests)
   - [x] Full `install.sh` integration test in container
   - [x] Trigger on push to `main` and PRs
   - [x] Fix ShellCheck warnings in existing scripts

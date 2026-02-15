@@ -95,6 +95,13 @@ else
   fail "VS Code settings path correct for macOS" "Missing macOS VS Code path"
 fi
 
+# Test: VS Code settings uses correct path for Linux
+if grep -q '.config/Code/User/settings.json' "$INSTALL_SH"; then
+  pass "VS Code settings path correct for Linux"
+else
+  fail "VS Code settings path correct for Linux" "Missing Linux VS Code path"
+fi
+
 # ── 3. apt package parsing ──────────────────────────────────
 
 echo "Package file parsing"
