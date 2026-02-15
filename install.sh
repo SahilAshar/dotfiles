@@ -269,6 +269,23 @@ main() {
     link_file "git/.gitconfig" ".gitconfig"
   fi
 
+  if [ -f "$DOTFILES_DIR/vscode/settings.json" ]; then
+    echo ""
+    echo "→ Linking VS Code settings..."
+    
+    # Determine VS Code settings location based on environment
+    if [ -n "${CODESPACES:-}" ]; then
+      # Codespaces: VS Code Server settings
+      link_file "vscode/settings.json" ".vscode-server/data/Machine/settings.json"
+    elif [ "$(uname -s)" = "Darwin" ]; then
+      # macOS: VS Code user settings
+      link_file "vscode/settings.json" "Library/Application Support/Code/User/settings.json"
+    else
+      # Linux: VS Code user settings
+      link_file "vscode/settings.json" ".config/Code/User/settings.json"
+    fi
+  fi
+
   echo ""
 
   deploy_copilot_prompts
