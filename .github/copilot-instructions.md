@@ -47,7 +47,7 @@ Modern development increasingly happens *with* AI agents in ephemeral cloud envi
 # Run the full installer (Codespaces auto-runs this)
 ./install.sh
 
-# Unit tests (22 tests, bash-based, no framework)
+# Unit tests (31 tests, bash-based, no framework)
 bash tests/test-install.sh
 
 # Lint all shell scripts
@@ -79,7 +79,7 @@ git/
 scripts/
   install-prompts.sh  # No-op placeholder; discovers agents/skills in .github/
 tests/
-  test-install.sh     # 22 unit tests (static analysis + sandboxed behavioral tests)
+  test-install.sh     # 31 unit tests (static analysis + sandboxed behavioral tests)
 zsh/
   .zshrc             # Zsh configuration
   .p10k.zsh          # Powerlevel10k theme config

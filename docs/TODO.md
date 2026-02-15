@@ -65,18 +65,23 @@ Priority-ordered checklist for evolving this dotfiles repository.
   - [x] Delete `github/.github/prompts/` (canonical templates - no longer needed)
   - [x] Delete `.github/prompts/` (example outputs - cluttering repo)
   - [x] Delete `docs/prompts.md` (outdated prompt documentation)
+  - [x] Delete `github/.github/` directory (empty leftover structure) (2026-02-15)
   - [ ] Clean up any `.bak` files from testing
 
-- [ ] **Git configuration**
-  - [ ] Create `git/.gitconfig` template with sensible defaults
-  - [ ] Add symlinking logic in `install.sh` for `.gitconfig`
-  - [ ] Document git config customization in README
+- [x] **Git configuration** (2026-02-15)
+  - [x] Create `git/.gitconfig` template with sensible defaults (completed in previous PR)
+  - [x] Add symlinking logic in `install.sh` for `.gitconfig` (completed in previous PR)
+  - [x] Document git config customization in README (completed in previous PR)
 
-- [ ] **VS Code configuration**
-  - [ ] Create `vscode/settings.json` with baseline settings
-  - [ ] Create `vscode/keybindings.json` if needed
-  - [ ] Add VS Code config deployment to `install.sh`
-  - [ ] Test in fresh Codespace
+- [x] **VS Code configuration** (2026-02-15)
+  - [x] Create `vscode/settings.json` with baseline settings
+  - [x] Add VS Code config deployment to `install.sh` with environment-specific paths:
+    - [x] Codespaces: `~/.vscode-server/data/Machine/settings.json`
+    - [x] macOS: `~/Library/Application Support/Code/User/settings.json`
+    - [x] Linux: `~/.config/Code/User/settings.json`
+  - [x] Add tests for VS Code settings symlinking (31 tests passing)
+  - [ ] Create `vscode/keybindings.json` if needed (defer - not critical)
+  - [ ] Test in fresh Codespace (manual validation needed)
 
 ### P1: Agent/Skill Ecosystem Foundation
 - [ ] **Create dotfiles maintenance agent** (`.github/agents/dotfiles-maintainer.md`)
@@ -102,7 +107,7 @@ Priority-ordered checklist for evolving this dotfiles repository.
 - [x] **Update README.md** with new philosophy
   
 - [x] **Create testing checklist**
-  - [x] Create `tests/test-install.sh` with 22 tests covering install.sh
+  - [x] Create `tests/test-install.sh` with 31 tests covering install.sh (updated 2026-02-15)
   - [ ] Test fresh Codespace creation (manual)
   - [ ] Test local macOS install (manual)
   - [x] Test re-running install.sh (idempotency) — covered by test suite
@@ -112,7 +117,7 @@ Priority-ordered checklist for evolving this dotfiles repository.
   - [x] Create `.github/workflows/ci.yml` with lint + test + integration jobs
   - [x] All jobs on `mcr.microsoft.com/devcontainers/universal` (Codespaces base image)
   - [x] ShellCheck linting on all `.sh` files
-  - [x] Run `tests/test-install.sh` unit tests (23 tests)
+  - [x] Run `tests/test-install.sh` unit tests (31 tests)
   - [x] Full `install.sh` integration test in container
   - [x] Trigger on push to `main` and PRs
   - [x] Fix ShellCheck warnings in existing scripts
