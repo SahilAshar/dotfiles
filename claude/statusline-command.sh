@@ -2,22 +2,27 @@
 set -euo pipefail
 # Claude Code status line - mirroring Powerlevel10k lean prompt from ~/.p10k.zsh
 #
-# Layout: <dir> <git-branch +staged !unstaged ?untracked>   <time>   [model]
+# Layout: <dir> <git-branch +staged !unstaged ?untracked>   [model] <ctx-bar> <pct>%
 #
 # Colors match p10k config:
 #   dir anchor:  color 39  bold (bright blue)
 #   git clean:   color 76  (green)
 #   git modified:color 178 (yellow)
 #   git untrack: color 39  (blue)
-#   time:        color 66  (muted teal, per p10k default)
+# Context bar color is threshold-based:
+#   < 70%:  color 76  (green)
+#   70-89%: color 178 (yellow)
+#   >= 90%: color 196 (red)
 
 input=$(cat)
 if command -v jq >/dev/null 2>&1; then
     cwd=$(jq -r '.cwd' <<<"$input")
     model=$(jq -r '.model.display_name // empty' <<<"$input")
+    ctx_pct=$(jq -r '.context_window.used_percentage // 0' <<<"$input" | cut -d. -f1)
 else
     cwd="${PWD:-$HOME}"
     model=""
+    ctx_pct=0
 fi
 
 # --- ANSI helpers (256-color) ---
@@ -28,7 +33,6 @@ dir_anchor="\033[1m$(c 39)"
 git_clean="$(c 76)"
 git_mod="$(c 178)"
 git_untrack="$(c 39)"
-time_color="$(c 66)"
 reset="$(rs)"
 
 # --- Directory: replace $HOME with ~ ---
@@ -54,17 +58,30 @@ if git --no-optional-locks -C "$cwd" rev-parse --git-dir >/dev/null 2>&1; then
     [ "$untracked" -gt 0 ] && git_part="${git_part} ${git_untrack}?${untracked}${reset}"
 fi
 
-# --- Time (12h format, matching p10k wizard "12h time" option) ---
-time_str="$(date +%I:%M%p | sed 's/^0//')"
-
-# --- Model (right-side extra, in muted grey) ---
+# --- Model ---
 model_part=""
 if [ -n "$model" ]; then
     model_part="   $(c 244)[${model}]${reset}"
 fi
 
-printf "%b%s%s%s   %s%s%s%s\n" \
+# --- Context window bar (8 chars wide, threshold-colored) ---
+ctx_part=""
+if [ -n "$ctx_pct" ] && [ "$ctx_pct" -ge 0 ] 2>/dev/null; then
+    if   [ "$ctx_pct" -ge 90 ]; then bar_color="$(c 196)"
+    elif [ "$ctx_pct" -ge 70 ]; then bar_color="$(c 178)"
+    else                              bar_color="$(c 76)"
+    fi
+    bar_width=8
+    filled=$(( ctx_pct * bar_width / 100 ))
+    empty=$(( bar_width - filled ))
+    bar=""
+    for ((i=0; i<filled; i++)); do bar+="▓"; done
+    for ((i=0; i<empty;  i++)); do bar+="░"; done
+    ctx_part=" ${bar_color}${bar}${reset} $(c 244)${ctx_pct}%${reset}"
+fi
+
+printf "%b%s%s%s%s%s\n" \
     "$dir_anchor" "$display_cwd" "$reset" \
     "$git_part" \
-    "$time_color" "$time_str" "$reset" \
-    "$model_part"
+    "$model_part" \
+    "$ctx_part"
