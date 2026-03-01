@@ -13,8 +13,8 @@ set -euo pipefail
 
 input=$(cat)
 if command -v jq >/dev/null 2>&1; then
-    cwd=$(echo "$input" | jq -r '.cwd')
-    model=$(echo "$input" | jq -r '.model.display_name // empty')
+    cwd=$(jq -r '.cwd' <<<"$input")
+    model=$(jq -r '.model.display_name // empty' <<<"$input")
 else
     cwd="${PWD:-$HOME}"
     model=""
