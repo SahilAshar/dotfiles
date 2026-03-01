@@ -1,16 +1,13 @@
 #!/bin/bash
 # Claude Code status line - mirroring Powerlevel10k lean prompt from ~/.p10k.zsh
 #
-# Layout (2-line lean style):
-#   ╭─ <dir> <git-branch +staged !unstaged ?untracked>   <time>
-#   ╰─
+# Layout: <dir> <git-branch +staged !unstaged ?untracked>   <time>   [model]
 #
 # Colors match p10k config:
 #   dir anchor:  color 39  bold (bright blue)
 #   git clean:   color 76  (green)
 #   git modified:color 178 (yellow)
 #   git untrack: color 39  (blue)
-#   frame:       color 240 (dark grey)
 #   time:        color 66  (muted teal, per p10k default)
 
 input=$(cat)
@@ -21,7 +18,6 @@ model=$(echo "$input" | jq -r '.model.display_name // empty')
 c()  { printf "\033[38;5;%sm" "$1"; }  # foreground color N
 rs() { printf "\033[0m"; }              # reset
 
-frame="$(c 240)"
 dir_anchor="\033[1m$(c 39)"
 git_clean="$(c 76)"
 git_mod="$(c 178)"
