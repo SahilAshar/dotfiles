@@ -227,6 +227,34 @@ link_file() {
   echo "✓ Linked: $dest → $src"
 }
 
+# Merge dotfiles VS Code settings into the machine settings file
+deploy_vscode_settings() {
+  local src="$DOTFILES_DIR/vscode/settings.json"
+  local dest="$HOME/.vscode-remote/data/Machine/settings.json"
+
+  if [ ! -f "$src" ]; then
+    echo "→ No vscode/settings.json found; skipping"
+    return
+  fi
+
+  if ! command -v jq >/dev/null 2>&1; then
+    echo "⚠ Warning: jq not available; skipping VS Code settings merge" >&2
+    return
+  fi
+
+  mkdir -p "$(dirname "$dest")"
+
+  if [ -f "$dest" ]; then
+    local merged
+    merged=$(jq -s '.[0] * .[1]' "$dest" "$src")
+    echo "$merged" > "$dest"
+    echo "✓ Merged VS Code settings into $dest"
+  else
+    cp "$src" "$dest"
+    echo "✓ Wrote VS Code settings to $dest"
+  fi
+}
+
 # Deploy Copilot prompts to VS Code
 deploy_copilot_prompts() {
   echo ""
@@ -280,6 +308,10 @@ main() {
   echo ""
 
   deploy_copilot_prompts
+  echo ""
+
+  echo "→ Deploying VS Code settings..."
+  deploy_vscode_settings
   echo ""
 
   echo "=============================="

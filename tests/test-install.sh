@@ -88,6 +88,13 @@ else
   fail "Links claude/settings.json into ~/.claude/ when present" "Missing Claude settings symlink call"
 fi
 
+# Test: install.sh deploys VS Code settings
+if grep -q 'deploy_vscode_settings' "$INSTALL_SH"; then
+  pass "Calls deploy_vscode_settings during install"
+else
+  fail "Calls deploy_vscode_settings during install" "Missing deploy_vscode_settings call in main()"
+fi
+
 # ── 3. apt package parsing ──────────────────────────────────
 
 echo "Package file parsing"
