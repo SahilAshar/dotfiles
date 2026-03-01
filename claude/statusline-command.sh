@@ -1,4 +1,5 @@
-#!/bin/bash
+#!/usr/bin/env bash
+set -euo pipefail
 # Claude Code status line - mirroring Powerlevel10k lean prompt from ~/.p10k.zsh
 #
 # Layout: <dir> <git-branch +staged !unstaged ?untracked>   <time>   [model]
