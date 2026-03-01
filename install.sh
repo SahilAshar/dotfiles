@@ -269,6 +269,14 @@ main() {
     link_file "git/.gitconfig" ".gitconfig"
   fi
 
+  if [ -f "$DOTFILES_DIR/claude/statusline-command.sh" ]; then
+    link_file "claude/statusline-command.sh" ".claude/statusline-command.sh"
+  fi
+
+  if [ -f "$DOTFILES_DIR/claude/settings.json" ]; then
+    link_file "claude/settings.json" ".claude/settings.json"
+  fi
+
   echo ""
 
   deploy_copilot_prompts
