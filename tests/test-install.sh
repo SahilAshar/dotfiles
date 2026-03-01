@@ -393,6 +393,62 @@ else
   fail "Has targeted yarn apt source recovery logic" "Missing helper function or yarn source detection"
 fi
 
+# ── 8. Statusline script behavior ─────────────────────────
+
+echo "Statusline script behavior"
+
+STATUSLINE_SH="$REPO_ROOT/claude/statusline-command.sh"
+# Helper: strip ANSI escape sequences from output
+strip_ansi() { sed 's/\x1b\[[0-9;]*m//g'; }
+
+# Test: 8-char bar at low percentage (green threshold, color 76)
+sl_output=$(echo '{"cwd":"/tmp","model":{"display_name":"Test"},"context_window":{"used_percentage":30}}' | bash "$STATUSLINE_SH" 2>/dev/null)
+sl_plain=$(echo "$sl_output" | strip_ansi)
+if echo "$sl_plain" | grep -q '▓▓░░░░░░ 30%'; then
+  pass "Context bar: correct 8-char bar at 30%"
+else
+  fail "Context bar: correct 8-char bar at 30%" "Got: $sl_plain"
+fi
+if echo "$sl_output" | cat -v | grep -q '38;5;76m'; then
+  pass "Context bar: green (color 76) below 70%"
+else
+  fail "Context bar: green (color 76) below 70%" "Expected color 76 in output"
+fi
+
+# Test: yellow threshold (color 178) at 75%
+sl_output=$(echo '{"cwd":"/tmp","model":{"display_name":"Test"},"context_window":{"used_percentage":75}}' | bash "$STATUSLINE_SH" 2>/dev/null)
+if echo "$sl_output" | cat -v | grep -q '38;5;178m'; then
+  pass "Context bar: yellow (color 178) at 70-89%"
+else
+  fail "Context bar: yellow (color 178) at 70-89%" "Expected color 178 in output"
+fi
+
+# Test: red threshold (color 196) at 95%
+sl_output=$(echo '{"cwd":"/tmp","model":{"display_name":"Test"},"context_window":{"used_percentage":95}}' | bash "$STATUSLINE_SH" 2>/dev/null)
+if echo "$sl_output" | cat -v | grep -q '38;5;196m'; then
+  pass "Context bar: red (color 196) at 90%+"
+else
+  fail "Context bar: red (color 196) at 90%+" "Expected color 196 in output"
+fi
+
+# Test: null used_percentage falls back to 0%
+sl_output=$(echo '{"cwd":"/tmp","model":{"display_name":"Test"},"context_window":{"used_percentage":null}}' | bash "$STATUSLINE_SH" 2>/dev/null)
+sl_plain=$(echo "$sl_output" | strip_ansi)
+if echo "$sl_plain" | grep -q '░░░░░░░░ 0%'; then
+  pass "Context bar: null percentage renders as 0%"
+else
+  fail "Context bar: null percentage renders as 0%" "Got: $sl_plain"
+fi
+
+# Test: absent context_window falls back to 0%
+sl_output=$(echo '{"cwd":"/tmp","model":{"display_name":"Test"}}' | bash "$STATUSLINE_SH" 2>/dev/null)
+sl_plain=$(echo "$sl_output" | strip_ansi)
+if echo "$sl_plain" | grep -q '░░░░░░░░ 0%'; then
+  pass "Context bar: absent context_window renders as 0%"
+else
+  fail "Context bar: absent context_window renders as 0%" "Got: $sl_plain"
+fi
+
 echo ""
 
 # ── Results ──────────────────────────────────────────────────
