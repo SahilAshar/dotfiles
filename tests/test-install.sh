@@ -74,6 +74,20 @@ else
   fail "Links git/.gitconfig into home when present" "Missing git config symlink call"
 fi
 
+# Test: install.sh links Claude statusline script into ~/.claude/
+if grep -q 'link_file "claude/statusline-command.sh" ".claude/statusline-command.sh"' "$INSTALL_SH"; then
+  pass "Links claude/statusline-command.sh into ~/.claude/ when present"
+else
+  fail "Links claude/statusline-command.sh into ~/.claude/ when present" "Missing statusline symlink call"
+fi
+
+# Test: install.sh links Claude settings into ~/.claude/
+if grep -q 'link_file "claude/settings.json" ".claude/settings.json"' "$INSTALL_SH"; then
+  pass "Links claude/settings.json into ~/.claude/ when present"
+else
+  fail "Links claude/settings.json into ~/.claude/ when present" "Missing Claude settings symlink call"
+fi
+
 # ── 3. apt package parsing ──────────────────────────────────
 
 echo "Package file parsing"
@@ -89,6 +103,13 @@ zsh
 # Commented out
 # htop
 EOF
+
+# Test: jq is listed (required by claude/statusline-command.sh)
+if grep -qx 'jq' "$REPO_ROOT/apt-packages.txt"; then
+  pass "apt-packages.txt includes jq (required by Claude statusline)"
+else
+  fail "apt-packages.txt includes jq" "jq missing from apt-packages.txt"
+fi
 
 # Test: Reads packages correctly (skipping comments and blanks)
 packages=$(sed -e 's/#.*//' -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' -e '/^$/d' "$FIXTURE_DIR/apt-packages.txt")
