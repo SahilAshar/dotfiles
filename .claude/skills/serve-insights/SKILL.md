@@ -24,14 +24,19 @@ After the user runs `/insights`, serve the generated HTML report via a local HTT
    ```
    If a server is already running, tell the user it's already being served and remind them to check the **Ports** tab.
 
-3. If no server is running, start one in the background:
+3. If no server is running, start one in the background and record its PID:
    ```
-   python3 -m http.server 8080 -d ~/.claude/usage-data
+   python3 -m http.server 8080 -d ~/.claude/usage-data > ~/.claude/usage-data/insights-server.log 2>&1 &
+   echo $! > ~/.claude/usage-data/insights-server.pid
    ```
-   Run this in the background.
 
 4. Tell the user:
    - The report is being served on **port 8080**
    - Check the **Ports** tab in the Codespace and click the forwarded URL
    - Append `/report.html` to the URL to view the report
    - Let you know when they're done so you can stop the server
+
+5. When the user says they're done, stop the server cleanly:
+   ```
+   kill "$(cat ~/.claude/usage-data/insights-server.pid)" && rm ~/.claude/usage-data/insights-server.pid
+   ```
