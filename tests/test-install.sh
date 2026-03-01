@@ -75,17 +75,17 @@ else
 fi
 
 # Test: install.sh links Claude statusline script into ~/.claude/
-if grep -q 'link_file "claude/statusline-command.sh" ".claude/statusline-command.sh"' "$INSTALL_SH"; then
-  pass "Links claude/statusline-command.sh into ~/.claude/ when present"
+if grep -q 'link_file ".claude/statusline-command.sh" ".claude/statusline-command.sh"' "$INSTALL_SH"; then
+  pass "Links .claude/statusline-command.sh into ~/.claude/ when present"
 else
-  fail "Links claude/statusline-command.sh into ~/.claude/ when present" "Missing statusline symlink call"
+  fail "Links .claude/statusline-command.sh into ~/.claude/ when present" "Missing statusline symlink call"
 fi
 
 # Test: install.sh links Claude settings into ~/.claude/
-if grep -q 'link_file "claude/settings.json" ".claude/settings.json"' "$INSTALL_SH"; then
-  pass "Links claude/settings.json into ~/.claude/ when present"
+if grep -q 'link_file ".claude/settings.json" ".claude/settings.json"' "$INSTALL_SH"; then
+  pass "Links .claude/settings.json into ~/.claude/ when present"
 else
-  fail "Links claude/settings.json into ~/.claude/ when present" "Missing Claude settings symlink call"
+  fail "Links .claude/settings.json into ~/.claude/ when present" "Missing Claude settings symlink call"
 fi
 
 # Test: install.sh deploys VS Code settings
@@ -397,7 +397,7 @@ fi
 
 echo "Statusline script behavior"
 
-STATUSLINE_SH="$REPO_ROOT/claude/statusline-command.sh"
+STATUSLINE_SH="$REPO_ROOT/.claude/statusline-command.sh"
 # Helper: strip ANSI escape sequences from output
 strip_ansi() { sed 's/\x1b\[[0-9;]*m//g'; }
 
