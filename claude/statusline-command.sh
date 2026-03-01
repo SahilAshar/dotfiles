@@ -75,8 +75,8 @@ if [ -n "$ctx_pct" ] && [ "$ctx_pct" -ge 0 ] 2>/dev/null; then
     filled=$(( ctx_pct * bar_width / 100 ))
     empty=$(( bar_width - filled ))
     bar=""
-    [ "$filled" -gt 0 ] && bar=$(printf "%${filled}s" | tr ' ' '=')
-    [ "$empty"  -gt 0 ] && bar="${bar}$(printf "%${empty}s" | tr ' ' '-')"
+    for ((i=0; i<filled; i++)); do bar+="▓"; done
+    for ((i=0; i<empty;  i++)); do bar+="░"; done
     ctx_part=" ${bar_color}${bar}${reset} $(c 244)${ctx_pct}%${reset}"
 fi
 
