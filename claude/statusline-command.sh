@@ -12,8 +12,13 @@ set -euo pipefail
 #   time:        color 66  (muted teal, per p10k default)
 
 input=$(cat)
-cwd=$(echo "$input" | jq -r '.cwd')
-model=$(echo "$input" | jq -r '.model.display_name // empty')
+if command -v jq >/dev/null 2>&1; then
+    cwd=$(echo "$input" | jq -r '.cwd')
+    model=$(echo "$input" | jq -r '.model.display_name // empty')
+else
+    cwd="${PWD:-$HOME}"
+    model=""
+fi
 
 # --- ANSI helpers (256-color) ---
 c()  { printf "\033[38;5;%sm" "$1"; }  # foreground color N
