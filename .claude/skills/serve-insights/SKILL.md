@@ -20,7 +20,7 @@ After the user runs `/insights`, serve the generated HTML report via a local HTT
 
 2. Check if a server is already running on port 8080:
    ```
-   lsof -i :8080
+   ss -ltn sport = :8080 | grep -q LISTEN
    ```
    If a server is already running, tell the user it's already being served and remind them to check the **Ports** tab.
 
