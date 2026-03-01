@@ -32,7 +32,7 @@ time_color="$(c 66)"
 reset="$(rs)"
 
 # --- Directory: replace $HOME with ~ ---
-display_cwd="${cwd/#$HOME/\~}"
+display_cwd="${cwd/#$HOME/~}"
 
 # --- Git status (using --no-optional-locks to avoid lock contention) ---
 git_part=""
