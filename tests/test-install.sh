@@ -95,6 +95,34 @@ else
   fail "Calls deploy_vscode_settings during install" "Missing deploy_vscode_settings call in main()"
 fi
 
+# Test: install.sh calls install_claude_code in main()
+if grep -q 'install_claude_code' "$INSTALL_SH"; then
+  pass "Calls install_claude_code during install"
+else
+  fail "Calls install_claude_code during install" "Missing install_claude_code call in main()"
+fi
+
+# Test: install_claude_code is gated to Codespaces only
+if grep -q 'CODESPACES' "$INSTALL_SH" && grep -A2 'install_claude_code()' "$INSTALL_SH" | grep -q 'CODESPACES'; then
+  pass "install_claude_code is gated to Codespaces environment"
+else
+  fail "install_claude_code is gated to Codespaces environment" "Missing CODESPACES guard"
+fi
+
+# Test: install_claude_code uses the native installer (not npm)
+if grep -A20 'install_claude_code()' "$INSTALL_SH" | grep -q 'claude.ai/install.sh'; then
+  pass "install_claude_code uses native installer (claude.ai/install.sh)"
+else
+  fail "install_claude_code uses native installer (claude.ai/install.sh)" "Expected curl to claude.ai/install.sh"
+fi
+
+# Test: install_claude_code checks if already installed (idempotent)
+if grep -A20 'install_claude_code()' "$INSTALL_SH" | grep -q 'command -v claude'; then
+  pass "install_claude_code is idempotent (checks if claude already installed)"
+else
+  fail "install_claude_code is idempotent (checks if claude already installed)" "Missing command -v claude check"
+fi
+
 # ── 3. apt package parsing ──────────────────────────────────
 
 echo "Package file parsing"

@@ -255,6 +255,32 @@ deploy_vscode_settings() {
   fi
 }
 
+# Install Claude Code (Codespaces only)
+install_claude_code() {
+  if [ -z "${CODESPACES:-}" ]; then
+    echo "→ Not in Codespaces; skipping Claude Code install"
+    return
+  fi
+
+  if command -v claude >/dev/null 2>&1; then
+    echo "✓ Claude Code already installed ($(claude --version 2>/dev/null || echo 'unknown version'))"
+    return
+  fi
+
+  if ! command -v curl >/dev/null 2>&1; then
+    echo "✗ ERROR: curl is required to install Claude Code" >&2
+    exit 1
+  fi
+
+  echo "→ Installing Claude Code..."
+  curl -fsSL https://claude.ai/install.sh | bash || {
+    echo "✗ Claude Code installation failed" >&2
+    exit 1
+  }
+
+  echo "✓ Claude Code installed"
+}
+
 # Deploy Copilot prompts to VS Code
 deploy_copilot_prompts() {
   echo ""
@@ -305,6 +331,9 @@ main() {
     link_file ".claude/settings.json" ".claude/settings.json"
   fi
 
+  echo ""
+
+  install_claude_code
   echo ""
 
   deploy_copilot_prompts
