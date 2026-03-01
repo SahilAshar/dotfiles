@@ -331,6 +331,20 @@ main() {
     link_file ".claude/settings.json" ".claude/settings.json"
   fi
 
+  if [ -d "$DOTFILES_DIR/.claude/skills" ]; then
+    echo "→ Linking Claude Code skills..."
+    for skill_dir in "$DOTFILES_DIR/.claude/skills"/*/; do
+      [ -d "$skill_dir" ] || continue
+      local skill_name
+      skill_name="$(basename "$skill_dir")"
+      if [ -f "$DOTFILES_DIR/.claude/skills/$skill_name/SKILL.md" ]; then
+        link_file ".claude/skills/$skill_name/SKILL.md" ".claude/skills/$skill_name/SKILL.md"
+      else
+        echo "⚠ Skipping skill '$skill_name': SKILL.md not found" >&2
+      fi
+    done
+  fi
+
   echo ""
 
   install_claude_code
