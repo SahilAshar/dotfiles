@@ -230,7 +230,8 @@ link_file() {
 # Merge dotfiles VS Code settings into the machine settings file
 deploy_vscode_settings() {
   local src="$DOTFILES_DIR/vscode/settings.json"
-  local dest="$HOME/.vscode-remote/data/Machine/settings.json"
+  local vscode_remote_dest="$HOME/.vscode-remote/data/Machine/settings.json"
+  local vscode_server_dest="$HOME/.vscode-server/data/Machine/settings.json"
 
   if [ ! -f "$src" ]; then
     echo "→ No vscode/settings.json found; skipping"
@@ -242,16 +243,52 @@ deploy_vscode_settings() {
     return
   fi
 
-  mkdir -p "$(dirname "$dest")"
+  # Merge into both .vscode-remote and .vscode-server to ensure consistency across environments
+  for dest in "$vscode_remote_dest" "$vscode_server_dest"; do
+    mkdir -p "$(dirname "$dest")"
+    if [ -f "$dest" ]; then
+      local merged
+      merged=$(jq -s '.[0] * .[1]' "$dest" "$src")
+      echo "$merged" > "$dest"
+      echo "✓ Merged VS Code settings into $dest"
+    else
+      cp "$src" "$dest"
+      echo "✓ Wrote VS Code settings to $dest"
+    fi
+  done
+}
 
-  if [ -f "$dest" ]; then
-    local merged
-    merged=$(jq -s '.[0] * .[1]' "$dest" "$src")
-    echo "$merged" > "$dest"
-    echo "✓ Merged VS Code settings into $dest"
+# Deploy Claude Code settings, respecting CLAUDE_CONFIG_DIR if set
+deploy_claude_settings() {
+  # Determine target directory: CLAUDE_CONFIG_DIR if set, otherwise ~/.claude
+  local claude_config_dir="${CLAUDE_CONFIG_DIR:-$HOME/.claude}"
+  mkdir -p "$claude_config_dir"
+
+  # Merge settings.json if present
+  local src="$DOTFILES_DIR/.claude/settings.json"
+  if [ -f "$src" ]; then
+    local dest="$claude_config_dir/settings.json"
+    if ! command -v jq >/dev/null 2>&1; then
+      echo "⚠ Warning: jq not available; skipping Claude settings merge" >&2
+    elif [ -f "$dest" ]; then
+      local merged
+      merged=$(jq -s '.[0] * .[1]' "$dest" "$src")
+      echo "$merged" > "$dest"
+      echo "✓ Merged Claude settings into $dest"
+    else
+      cp "$src" "$dest"
+      echo "✓ Wrote Claude settings to $dest"
+    fi
   else
-    cp "$src" "$dest"
-    echo "✓ Wrote VS Code settings to $dest"
+    echo "→ No .claude/settings.json found; skipping settings merge"
+  fi
+
+  # Deploy statusline script if present
+  local statusline_src="$DOTFILES_DIR/.claude/statusline-command.sh"
+  if [ -f "$statusline_src" ]; then
+    cp "$statusline_src" "$claude_config_dir/statusline-command.sh"
+    chmod +x "$claude_config_dir/statusline-command.sh"
+    echo "✓ Deployed Claude statusline script to $claude_config_dir/statusline-command.sh"
   fi
 }
 
@@ -323,13 +360,11 @@ main() {
     link_file "git/.gitconfig" ".gitconfig"
   fi
 
-  if [ -f "$DOTFILES_DIR/.claude/statusline-command.sh" ]; then
-    link_file ".claude/statusline-command.sh" ".claude/statusline-command.sh"
+  if [ -f "$DOTFILES_DIR/ghostty/config" ]; then
+    link_file "ghostty/config" ".config/ghostty/config"
   fi
 
-  if [ -f "$DOTFILES_DIR/.claude/settings.json" ]; then
-    link_file ".claude/settings.json" ".claude/settings.json"
-  fi
+  deploy_claude_settings
 
   if [ -d "$DOTFILES_DIR/.claude/skills" ]; then
     echo "→ Linking Claude Code skills..."

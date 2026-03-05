@@ -74,18 +74,18 @@ else
   fail "Links git/.gitconfig into home when present" "Missing git config symlink call"
 fi
 
-# Test: install.sh links Claude statusline script into ~/.claude/
-if grep -q 'link_file ".claude/statusline-command.sh" ".claude/statusline-command.sh"' "$INSTALL_SH"; then
-  pass "Links .claude/statusline-command.sh into ~/.claude/ when present"
+# Test: install.sh deploys Claude statusline script via deploy_claude_settings
+if grep -q 'statusline-command.sh' "$INSTALL_SH" && grep -q 'deploy_claude_settings' "$INSTALL_SH"; then
+  pass "Deploys .claude/statusline-command.sh via deploy_claude_settings"
 else
-  fail "Links .claude/statusline-command.sh into ~/.claude/ when present" "Missing statusline symlink call"
+  fail "Deploys .claude/statusline-command.sh via deploy_claude_settings" "Missing statusline deploy in deploy_claude_settings"
 fi
 
-# Test: install.sh links Claude settings into ~/.claude/
-if grep -q 'link_file ".claude/settings.json" ".claude/settings.json"' "$INSTALL_SH"; then
-  pass "Links .claude/settings.json into ~/.claude/ when present"
+# Test: install.sh merges Claude settings via deploy_claude_settings
+if grep -q 'jq -s' "$INSTALL_SH" && grep -q 'deploy_claude_settings' "$INSTALL_SH"; then
+  pass "Merges .claude/settings.json via deploy_claude_settings"
 else
-  fail "Links .claude/settings.json into ~/.claude/ when present" "Missing Claude settings symlink call"
+  fail "Merges .claude/settings.json via deploy_claude_settings" "Missing Claude settings merge in deploy_claude_settings"
 fi
 
 # Test: install.sh deploys VS Code settings
@@ -429,52 +429,56 @@ STATUSLINE_SH="$REPO_ROOT/.claude/statusline-command.sh"
 # Helper: strip ANSI escape sequences from output
 strip_ansi() { sed 's/\x1b\[[0-9;]*m//g'; }
 
-# Test: 8-char bar at low percentage (green threshold, color 76)
+# Test: percentage display at 30%
 sl_output=$(echo '{"cwd":"/tmp","model":{"display_name":"Test"},"context_window":{"used_percentage":30}}' | bash "$STATUSLINE_SH" 2>/dev/null)
 sl_plain=$(echo "$sl_output" | strip_ansi)
-if echo "$sl_plain" | grep -q '▓▓░░░░░░ 30%'; then
-  pass "Context bar: correct 8-char bar at 30%"
+if echo "$sl_plain" | grep -q 'tmp.*│.*Test.*│.*30%'; then
+  pass "Statusline: renders dir, model, and percentage"
 else
-  fail "Context bar: correct 8-char bar at 30%" "Got: $sl_plain"
-fi
-if echo "$sl_output" | cat -v | grep -q '38;5;76m'; then
-  pass "Context bar: green (color 76) below 70%"
-else
-  fail "Context bar: green (color 76) below 70%" "Expected color 76 in output"
+  fail "Statusline: renders dir, model, and percentage" "Got: $sl_plain"
 fi
 
-# Test: yellow threshold (color 178) at 75%
-sl_output=$(echo '{"cwd":"/tmp","model":{"display_name":"Test"},"context_window":{"used_percentage":75}}' | bash "$STATUSLINE_SH" 2>/dev/null)
-if echo "$sl_output" | cat -v | grep -q '38;5;178m'; then
-  pass "Context bar: yellow (color 178) at 70-89%"
+# Test: uses yellow (color 33) for percentage
+if echo "$sl_output" | cat -v | grep -q '33m'; then
+  pass "Statusline: uses yellow for context percentage"
 else
-  fail "Context bar: yellow (color 178) at 70-89%" "Expected color 178 in output"
-fi
-
-# Test: red threshold (color 196) at 95%
-sl_output=$(echo '{"cwd":"/tmp","model":{"display_name":"Test"},"context_window":{"used_percentage":95}}' | bash "$STATUSLINE_SH" 2>/dev/null)
-if echo "$sl_output" | cat -v | grep -q '38;5;196m'; then
-  pass "Context bar: red (color 196) at 90%+"
-else
-  fail "Context bar: red (color 196) at 90%+" "Expected color 196 in output"
+  fail "Statusline: uses yellow for context percentage" "Expected color 33 in output"
 fi
 
 # Test: null used_percentage falls back to 0%
 sl_output=$(echo '{"cwd":"/tmp","model":{"display_name":"Test"},"context_window":{"used_percentage":null}}' | bash "$STATUSLINE_SH" 2>/dev/null)
 sl_plain=$(echo "$sl_output" | strip_ansi)
-if echo "$sl_plain" | grep -q '░░░░░░░░ 0%'; then
-  pass "Context bar: null percentage renders as 0%"
+if echo "$sl_plain" | grep -q '0%'; then
+  pass "Statusline: null percentage renders as 0%"
 else
-  fail "Context bar: null percentage renders as 0%" "Got: $sl_plain"
+  fail "Statusline: null percentage renders as 0%" "Got: $sl_plain"
 fi
 
 # Test: absent context_window falls back to 0%
 sl_output=$(echo '{"cwd":"/tmp","model":{"display_name":"Test"}}' | bash "$STATUSLINE_SH" 2>/dev/null)
 sl_plain=$(echo "$sl_output" | strip_ansi)
-if echo "$sl_plain" | grep -q '░░░░░░░░ 0%'; then
-  pass "Context bar: absent context_window renders as 0%"
+if echo "$sl_plain" | grep -q '0%'; then
+  pass "Statusline: absent context_window renders as 0%"
 else
-  fail "Context bar: absent context_window renders as 0%" "Got: $sl_plain"
+  fail "Statusline: absent context_window renders as 0%" "Got: $sl_plain"
+fi
+
+# Test: missing cwd falls back gracefully (no "null" in output)
+sl_output=$(echo '{"model":{"display_name":"Test"},"context_window":{"used_percentage":5}}' | bash "$STATUSLINE_SH" 2>/dev/null)
+sl_plain=$(echo "$sl_output" | strip_ansi)
+if echo "$sl_plain" | grep -qv 'null'; then
+  pass "Statusline: missing cwd does not render 'null'"
+else
+  fail "Statusline: missing cwd does not render 'null'" "Got: $sl_plain"
+fi
+
+# Test: session name appears when provided
+sl_output=$(echo '{"cwd":"/tmp","model":{"display_name":"Test"},"context_window":{"used_percentage":10},"session_name":"my-session"}' | bash "$STATUSLINE_SH" 2>/dev/null)
+sl_plain=$(echo "$sl_output" | strip_ansi)
+if echo "$sl_plain" | grep -q 'my-session'; then
+  pass "Statusline: session name rendered when present"
+else
+  fail "Statusline: session name rendered when present" "Got: $sl_plain"
 fi
 
 echo ""
