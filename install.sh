@@ -201,6 +201,12 @@ link_file() {
     exit 1
   fi
 
+  # If source and destination resolve to the same file, skip (e.g. ~/.claude -> ~/dotfiles/.claude)
+  if [ "$(readlink -f "$src")" = "$(readlink -f "$dest")" ] 2>/dev/null; then
+    echo "✓ Already in place (same path): $dest"
+    return
+  fi
+
   # If symlink already points to correct location, skip
   if [ -L "$dest" ] && [ "$(readlink "$dest")" = "$src" ]; then
     echo "✓ Symlink already correct: $dest"
@@ -368,14 +374,26 @@ main() {
 
   if [ -d "$DOTFILES_DIR/.claude/skills" ]; then
     echo "→ Linking Claude Code skills..."
+    local claude_skills_dir="${CLAUDE_CONFIG_DIR:-$HOME/.claude}/skills"
+    mkdir -p "$claude_skills_dir"
     for skill_dir in "$DOTFILES_DIR/.claude/skills"/*/; do
       [ -d "$skill_dir" ] || continue
       local skill_name
       skill_name="$(basename "$skill_dir")"
-      if [ -f "$DOTFILES_DIR/.claude/skills/$skill_name/SKILL.md" ]; then
-        link_file ".claude/skills/$skill_name/SKILL.md" ".claude/skills/$skill_name/SKILL.md"
-      else
+      if [ ! -f "$skill_dir/SKILL.md" ]; then
         echo "⚠ Skipping skill '$skill_name': SKILL.md not found" >&2
+        continue
+      fi
+      local dest="$claude_skills_dir/$skill_name"
+      if [ -L "$dest" ] && [ "$(readlink "$dest")" = "$skill_dir" ]; then
+        echo "✓ Skill symlink already correct: $skill_name"
+      else
+        if [ -L "$dest" ] || [ -e "$dest" ]; then
+          echo "→ Replacing existing skill: $skill_name"
+          rm -rf "$dest"
+        fi
+        ln -s "$skill_dir" "$dest"
+        echo "✓ Linked skill: $skill_name → $skill_dir"
       fi
     done
   fi
