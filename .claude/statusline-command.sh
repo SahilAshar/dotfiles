@@ -1,4 +1,10 @@
-#!/bin/bash
+#!/usr/bin/env bash
+
+# Guard: jq is required to parse the JSON input
+if ! command -v jq >/dev/null 2>&1; then
+  echo "statusline: jq not found"
+  exit 0
+fi
 
 # Read JSON input from stdin; extract all values in a single jq call
 input=$(cat)
@@ -8,6 +14,11 @@ IFS=$'\t' read -r model cwd used_pct session_name <<< "$(jq -r '[
     (.context_window.used_percentage // 0 | floor | tostring),
     (.session_name // "")
   ] | @tsv' <<< "$input")"
+
+# Fallback if cwd is missing or null
+if [ -z "$cwd" ] || [ "$cwd" = "null" ]; then
+  cwd=${PWD:-$HOME}
+fi
 
 # Get git branch + dirty status in minimal git calls
 git_info=""

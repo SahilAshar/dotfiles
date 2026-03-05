@@ -260,31 +260,27 @@ deploy_vscode_settings() {
 
 # Deploy Claude Code settings, respecting CLAUDE_CONFIG_DIR if set
 deploy_claude_settings() {
-  local src="$DOTFILES_DIR/.claude/settings.json"
-
-  if [ ! -f "$src" ]; then
-    echo "→ No .claude/settings.json found; skipping"
-    return
-  fi
-
   # Determine target directory: CLAUDE_CONFIG_DIR if set, otherwise ~/.claude
   local claude_config_dir="${CLAUDE_CONFIG_DIR:-$HOME/.claude}"
-  local dest="$claude_config_dir/settings.json"
-
-  if ! command -v jq >/dev/null 2>&1; then
-    echo "⚠ Warning: jq not available; skipping Claude settings merge" >&2
-    return
-  fi
-
   mkdir -p "$claude_config_dir"
-  if [ -f "$dest" ]; then
-    local merged
-    merged=$(jq -s '.[0] * .[1]' "$dest" "$src")
-    echo "$merged" > "$dest"
-    echo "✓ Merged Claude settings into $dest"
+
+  # Merge settings.json if present
+  local src="$DOTFILES_DIR/.claude/settings.json"
+  if [ -f "$src" ]; then
+    local dest="$claude_config_dir/settings.json"
+    if ! command -v jq >/dev/null 2>&1; then
+      echo "⚠ Warning: jq not available; skipping Claude settings merge" >&2
+    elif [ -f "$dest" ]; then
+      local merged
+      merged=$(jq -s '.[0] * .[1]' "$dest" "$src")
+      echo "$merged" > "$dest"
+      echo "✓ Merged Claude settings into $dest"
+    else
+      cp "$src" "$dest"
+      echo "✓ Wrote Claude settings to $dest"
+    fi
   else
-    cp "$src" "$dest"
-    echo "✓ Wrote Claude settings to $dest"
+    echo "→ No .claude/settings.json found; skipping settings merge"
   fi
 
   # Deploy statusline script if present

@@ -1,3 +1,15 @@
 {
-  "terminal.integrated.defaultProfile.linux": "zsh"
+  "files.trimTrailingWhitespace": true,
+  "files.insertFinalNewline": true,
+  "files.eol": "\n",
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.organizeImports": "explicit",
+    "source.fixAll": "explicit"
+  },
+  "git.autofetch": false,
+  "terminal.integrated.defaultProfile.linux": "zsh",
+  "terminal.integrated.defaultProfile.osx": "zsh",
+  "terminal.integrated.gpuAcceleration": "off",
+  "terminal.integrated.scrollback": 1000
 }
