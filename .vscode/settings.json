@@ -7,7 +7,9 @@
     "source.organizeImports": "explicit",
     "source.fixAll": "explicit"
   },
-  "git.autofetch": true,
+  "git.autofetch": false,
   "terminal.integrated.defaultProfile.linux": "zsh",
-  "terminal.integrated.defaultProfile.osx": "zsh"
+  "terminal.integrated.defaultProfile.osx": "zsh",
+  "terminal.integrated.gpuAcceleration": "off",
+  "terminal.integrated.scrollback": 1000
 }
