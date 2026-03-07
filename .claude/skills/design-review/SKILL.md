@@ -29,66 +29,30 @@ If not provided, ask the user.
 
 Read the design doc(s) and scan the codebase to identify:
 - **Entry points**: What callers/clients interact with (for top-down reviewer)
-- **Infrastructure**: What low-level systems are involved — databases, Solr, external APIs, shared libraries (for bottom-up reviewer)
+- **Infrastructure**: What low-level systems are involved — databases, search indices, external APIs, shared libraries (for bottom-up reviewer)
 - **Intermediate layers**: Federation logic, transformation layers, serialization boundaries
 
 Use Glob and Grep to quickly map the codebase structure relevant to the design.
 
 ### Step 2: Launch Both Reviewers in Parallel
 
-Launch TWO Task agents simultaneously (in a single message with both tool calls) using `subagent_type: "Plan"` and `run_in_background: true`.
+Launch TWO Task agents simultaneously (in a single message with both tool calls) using `run_in_background: true`.
+
+Each agent should execute the corresponding standalone review skill, passing along the design doc path(s) and relevant codebase context identified in Step 1. This ensures the orchestrator always uses the same review criteria as the standalone skills and avoids prompt drift.
 
 **Agent 1: Top-Down Reviewer**
 
-```
-You are a rigorous "top-down reviewer." Evaluate the design from the CALLER perspective.
-
-Read the design doc at [path]. Then read the actual codebase to validate.
-
-Cover these categories:
-
-1. CALLER EXPERIENCE: What changes for callers? Is the API contract clear? What happens with stale, invalid, or cross-service inputs?
-
-2. LAYER COMPLEXITY: Walk each layer from caller to implementation. Rate complexity 1-5. What can go wrong at each layer? What's the error handling story?
-
-3. BREAKING CHANGES: List every caller-visible change. Is each necessary? What's the migration path?
-
-4. EDGE CASES: Think adversarially — empty inputs, exact boundaries, concurrent requests, stale state from deployments, tampered inputs, extreme parameter values.
-
-5. SIMPLIFICATION: Where is the design over-engineered? Where is it under-specified? What would you remove?
-
-Read the actual code — don't just review the doc. Cite file paths and line numbers. Organize by severity: BLOCKER > HIGH > MEDIUM > LOW.
-```
-
-Customize the prompt with specific file paths for the entry points, input/output schemas, and upstream callers relevant to this design.
+Use the Task tool with `subagent_type: "Plan"` and a prompt that instructs the agent to follow the `/review-top-down` skill (located at `.claude/skills/review-top-down/SKILL.md`). Provide:
+- The design doc path(s)
+- Paths to primary entry points and public APIs touched by the design
+- Any specific caller scenarios or concerns the user mentioned
 
 **Agent 2: Bottom-Up Reviewer**
 
-```
-You are a rigorous "bottom-up reviewer." Evaluate the design from the INFRASTRUCTURE perspective, starting at the lowest layer.
-
-Read the design doc at [path]. Then read the actual codebase starting from infrastructure up.
-
-Cover these categories:
-
-1. INFRASTRUCTURE VALIDATION: Does the core mechanism work? Trace the exact code path from the proposed change through shared libraries to the underlying system.
-
-2. SERIALIZATION PATH: Trace data flow through every serialization/deserialization boundary. Check model_dump(), model_validate_json(), type conversions. What happens with extra fields?
-
-3. MIGRATION PATH: For each changing component, list every line that touches old behavior. What replaces it? Are there implicit contracts that break?
-
-4. IMPEDANCE MISMATCHES: Where do design assumptions not match actual code? Missing types, wrong signatures, unsupported patterns?
-
-5. TERMINATION CONDITIONS: How does the system know when to stop? Are heuristics reliable? What signals are available from the infrastructure?
-
-6. PERFORMANCE OVERHEAD: Quantify overhead — re-fetching, extra queries, larger payloads. Calculate worst cases.
-
-7. SIMPLEST PATH: What is the minimal viable implementation? What shortcuts does the bottom-up view reveal?
-
-Read the actual code — don't just review the doc. Cite file paths and line numbers. Organize by severity: BLOCKER > HIGH > MEDIUM > LOW.
-```
-
-Customize with specific file paths for infrastructure code, shared libraries, leaf components, and serialization boundaries.
+Use the Task tool with `subagent_type: "Plan"` and a prompt that instructs the agent to follow the `/review-bottom-up` skill (located at `.claude/skills/review-bottom-up/SKILL.md`). Provide:
+- The design doc path(s)
+- Paths to infrastructure code, shared libraries, and leaf components
+- Any specific implementation concerns the user mentioned
 
 ### Step 3: Synthesize Findings
 

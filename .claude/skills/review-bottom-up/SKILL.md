@@ -6,7 +6,7 @@ allowed-tools: Task, Read, Glob, Grep, Bash, AskUserQuestion
 
 # Bottom-Up Design Review
 
-Review a design, architecture, or code change from the **implementation/infrastructure perspective** — starting at the lowest layer (databases, Solr, SDKs, protocols) and tracing how changes bubble up through each layer to the API surface. This review prioritizes implementation feasibility and catches impedance mismatches.
+Review a design, architecture, or code change from the **implementation/infrastructure perspective** — starting at the lowest layer (databases, search indices, SDKs, protocols) and tracing how changes bubble up through each layer to the API surface. This review prioritizes implementation feasibility and catches impedance mismatches.
 
 ## When to Use
 
@@ -29,7 +29,7 @@ If not provided, ask the user for these.
 ### Step 1: Gather Context
 
 Read the design doc(s) the user specified. Then explore the codebase to identify:
-- What are the lowest-level systems involved (databases, Solr, external APIs, SDKs)?
+- What are the lowest-level systems involved (databases, search indices, external APIs, SDKs)?
 - What shared libraries are used? What abstractions do they provide?
 - What are the leaf/terminal components (the things that actually talk to storage/APIs)?
 - What intermediate layers exist between the leaves and the entry points?
@@ -51,15 +51,15 @@ Then read the actual codebase starting from the infrastructure layer up.
 
 ### 1. Infrastructure Validation
 - Does the design's core mechanism actually work at the infrastructure level?
-- Trace the exact code path from the proposed change through shared libraries to the underlying system (database, Solr, external API)
+- Trace the exact code path from the proposed change through shared libraries to the underlying system (database, search index, external API)
 - Verify parameter names, types, and serialization formats
 - Check for conflicts with existing parameters or defaults
 
 ### 2. Serialization Path Tracing
 - Trace how data flows from the caller through serialization to the infrastructure and back
-- Check every type conversion, model_dump(), model_validate_json() call
-- What happens when types don't match? When extra fields are present?
-- Are there strict validation modes (extra="forbid") that would reject new fields?
+- Check every type conversion and serialization/deserialization call (e.g., JSON encoding, ORM hydration, schema validation)
+- What happens when types don't match? When extra or unexpected fields are present?
+- Are there strict validation modes that would reject new or unknown fields?
 
 ### 3. Migration Path (Current → Proposed)
 - For each component that changes, list every line of code that touches the old behavior
