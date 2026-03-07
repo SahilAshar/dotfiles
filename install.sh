@@ -324,20 +324,6 @@ install_claude_code() {
   echo "✓ Claude Code installed"
 }
 
-# Deploy Copilot prompts to VS Code
-deploy_copilot_prompts() {
-  echo ""
-  echo "→ Deploying Copilot prompts/agents/skills..."
-
-  local prompts_installer="$DOTFILES_DIR/scripts/install-prompts.sh"
-
-  if [ -f "$prompts_installer" ] && [ -r "$prompts_installer" ]; then
-    bash "$prompts_installer"
-  else
-    echo "⚠ Warning: scripts/install-prompts.sh is missing or not readable; skipping Copilot prompt deployment" >&2
-  fi
-}
-
 # Main installation flow
 main() {
   echo "Starting installation..."
@@ -401,9 +387,6 @@ main() {
   echo ""
 
   install_claude_code
-  echo ""
-
-  deploy_copilot_prompts
   echo ""
 
   echo "→ Deploying VS Code settings..."

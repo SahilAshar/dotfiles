@@ -2,81 +2,10 @@
 
 Priority-ordered checklist for evolving this dotfiles repository.
 
-## Tomorrow: Work Setup (2026-02-09)
-
-### Universal Skills (Personal Dotfiles)
-- [ ] **PR generation skill** (`.github/skills/pr-generation/SKILL.md`)
-  - [ ] Create PR from current branch state
-  - [ ] Auto-generate title and description from commits/diffs
-  - [ ] Include testing evidence and deployment notes
-  - [ ] Template structure for consistency
-
-- [ ] **TDD bug fixing skill** (`.github/skills/tdd-bug-fix/SKILL.md`)
-  - [ ] Write failing test that reproduces bug
-  - [ ] Implement minimal fix
-  - [ ] Verify test passes
-  - [ ] Include regression test patterns
-
-- [ ] **Git worktree skill** (`.github/skills/git-worktree/SKILL.md`)
-  - [ ] Set up parallel worktrees for concurrent work
-  - [ ] Best practices for worktree organization
-  - [ ] Clean up stale worktrees
-  - [ ] Integration with PR workflows
-
-- [ ] **Context management skill** (`.github/skills/context-management/SKILL.md`)
-  - [ ] Strategies for keeping agent context relevant
-  - [ ] When to summarize vs when to preserve detail
-  - [ ] Managing large codebases efficiently
-  - [ ] Token budget awareness
-
-### Enterprise Shim Repo Setup (Work)
-- [ ] **Create enterprise dotfiles shim repo structure**
-  - [ ] `install.sh` that clones personal dotfiles first
-  - [ ] Run personal `install.sh`, then layer enterprise config
-  - [ ] Document in shim README: personal → enterprise boundary
-
-- [ ] **Enterprise-specific skills** (in shim repo)
-  - [ ] Internal documentation integration skill (uses work MCP servers)
-  - [ ] Internal GitHub access patterns skill
-  - [ ] Enterprise Codespaces setup best practices skill
-  - [ ] Makefile-aware workflows skill (for cookiecutter repos)
-
-- [ ] **Enterprise CI setup** (in shim repo)
-  - [ ] `.github/workflows/ci.yml` using internal Codespaces images
-  - [ ] Same structure as personal dotfiles (lint + test + integration)
-  - [ ] Test against internal base image, not public universal image
-
-- [ ] **MCP server configurations** (in shim repo)
-  - [ ] Document which MCP servers are available
-  - [ ] Create example agent that uses work MCP servers
-  - [ ] Test MCP server connectivity in CI
-
-### Validation
-- [ ] Clone personal dotfiles to work machine
-- [ ] Verify all universal skills load correctly
-- [ ] Set up enterprise shim repo
-- [ ] Test full install flow (personal + enterprise layering)
-- [ ] Create one workspace-specific agent manually to validate approach
-
 ## High Priority (Do First)
 
 ### P0: Critical Cleanup
-- [x] **Remove redundant directories**
-  - [x] Delete `github/.github/prompts/` (canonical templates - no longer needed)
-  - [x] Delete `.github/prompts/` (example outputs - cluttering repo)
-  - [x] Delete `docs/prompts.md` (outdated prompt documentation)
-  - [ ] Clean up any `.bak` files from testing
-
-- [ ] **Git configuration**
-  - [ ] Create `git/.gitconfig` template with sensible defaults
-  - [ ] Add symlinking logic in `install.sh` for `.gitconfig`
-  - [ ] Document git config customization in README
-
-- [ ] **VS Code configuration**
-  - [ ] Create `vscode/settings.json` with baseline settings
-  - [ ] Create `vscode/keybindings.json` if needed
-  - [ ] Add VS Code config deployment to `install.sh`
-  - [ ] Test in fresh Codespace
+- [ ] Clean up any `.bak` files from testing
 
 ### P1: Agent/Skill Ecosystem Foundation
 - [ ] **Create dotfiles maintenance agent** (`.github/agents/dotfiles-maintainer.md`)
@@ -99,26 +28,10 @@ Priority-ordered checklist for evolving this dotfiles repository.
   - [ ] Document: Add workflow to README
 
 ### P2: Documentation & Testing
-- [x] **Update README.md** with new philosophy
-  
-- [x] **Create testing checklist**
-  - [x] Create `tests/test-install.sh` with 22 tests covering install.sh
-  - [ ] Test fresh Codespace creation (manual)
-  - [ ] Test local macOS install (manual)
-  - [x] Test re-running install.sh (idempotency) — covered by test suite
-  - [ ] Test with missing dependencies (no curl, no git) — partial coverage
-  
-- [x] **Dotfiles CI/CD** (GitHub Actions) — merged in PR #9
-  - [x] Create `.github/workflows/ci.yml` with lint + test + integration jobs
-  - [x] All jobs on `mcr.microsoft.com/devcontainers/universal` (Codespaces base image)
-  - [x] ShellCheck linting on all `.sh` files
-  - [x] Run `tests/test-install.sh` unit tests (23 tests)
-  - [x] Full `install.sh` integration test in container
-  - [x] Trigger on push to `main` and PRs
-  - [x] Fix ShellCheck warnings in existing scripts
-  - [x] PR review feedback: safer `.bak` handling, decoupled test fixtures, doc alignment
-  - [ ] TODO: Add `macos-latest` runner job (do NOT implement yet)
-   
+- [ ] Test fresh Codespace creation (manual)
+- [ ] Test local macOS install (manual)
+- [ ] Test with missing dependencies (no curl, no git) — partial coverage
+- [ ] Add `macos-latest` runner job to CI
 - [ ] **Add troubleshooting guide**
   - [ ] Common errors and solutions
   - [ ] How to check logs in Codespaces
@@ -252,11 +165,7 @@ Priority-ordered checklist for evolving this dotfiles repository.
 - [ ] **Audit current files**
   - [ ] Identify unused configurations
   - [ ] Remove or document "why kept but not used"
-  
-- [x] **Simplify install-prompts.sh**
-  - [x] Rewrote to discover agents/skills in `.github/` instead of referencing deleted prompts
-  - [ ] Consider: Should agents/skills be deployed globally (`~/.copilot/`) in future?
-  - [ ] If so, implement symlink/copy from `.github/agents/` and `.github/skills/` to `~/.copilot/`
+- [ ] Consider: Should Copilot agents/skills be deployed globally (`~/.copilot/`) in future?
 
 ## Notes
 - This TODO is a living document - update as priorities shift

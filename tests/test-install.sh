@@ -393,13 +393,6 @@ else
   fail "Error messages written to stderr" "Only $stderr_count instances found"
 fi
 
-# Test: deploy_copilot_prompts handles missing script gracefully
-if grep -A10 'deploy_copilot_prompts()' "$INSTALL_SH" | grep -q '\[ -[fr]'; then
-  pass "deploy_copilot_prompts checks script exists before running"
-else
-  fail "deploy_copilot_prompts checks script exists" "No file check found"
-fi
-
 # Test: Does not allow insecure apt repositories globally
 if grep -q 'Acquire::AllowInsecureRepositories=true' "$INSTALL_SH"; then
   fail "Does not allow insecure apt repositories globally" "Found Acquire::AllowInsecureRepositories=true"

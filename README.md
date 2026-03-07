@@ -20,7 +20,7 @@ When you create a Codespace with this dotfiles repo configured:
 1. **Installs packages** - `zsh`, `ripgrep`, and other essentials (Linux only)
 2. **Configures shell** - Sets up zsh with Oh My Zsh, Powerlevel10k theme, and autosuggestions
 3. **Links configurations** - Symlinks `.zshrc`, `.p10k.zsh`, `.gitconfig`, VS Code settings
-4. **Deploys agentic workflows** - Installs universal Copilot agents and skills
+4. **Deploys agentic workflows** - Copilot agents/skills are auto-discovered from `.github/`; Claude Code skills are symlinked into `~/.claude/skills/`
 
 **Total time**: ~30 seconds on a fresh Codespace.  
 **Manual steps required**: Zero.
@@ -50,6 +50,16 @@ The installer is fully idempotent - safe to run multiple times.
 
 ## Repository Structure
 ```
+.claude/
+  settings.json        # Claude Code settings (merged into ~/.claude/)
+  settings.local.json  # Repo-scoped Claude Code settings
+  statusline-command.sh # Claude Code statusline script
+  skills/              # Claude Code skills (symlinked into ~/.claude/skills/)
+    design-review/
+    review-bottom-up/
+    review-top-down/
+    serve-insights/
+    sync-dotfiles/
 .github/
   agents/              # Universal Copilot agents (work across all repos)
     readability-reviewer.md
@@ -57,20 +67,24 @@ The installer is fully idempotent - safe to run multiple times.
     readability/
       SKILL.md
   copilot-instructions.md  # Always-on guidance (applies to all tasks)
+  workflows/
+    ci.yml             # Three-stage CI pipeline (lint + test + integration)
 docs/
-  TODO.md            # Prioritized improvement checklist
+  TODO.md              # Prioritized improvement checklist
+ghostty/
+  config               # Ghostty terminal configuration
 git/
-  .gitconfig          # Git configuration template
-scripts/
-  install-prompts.sh  # Internal helper for deploying agents/skills
+  .gitconfig           # Git configuration template
+tests/
+  test-install.sh      # 22+ tests for install.sh
 vscode/
-  settings.json       # VS Code user settings
+  settings.json        # VS Code user settings
 zsh/
-  .zshrc             # Zsh configuration
-  .p10k.zsh          # Powerlevel10k theme configuration
-apt-packages.txt     # Linux packages to install
-install.sh           # PRIMARY ENTRY POINT (auto-run by Codespaces)
-README.md            # You are here
+  .zshrc               # Zsh configuration
+  .p10k.zsh            # Powerlevel10k theme configuration
+apt-packages.txt       # Linux packages to install
+install.sh             # PRIMARY ENTRY POINT (auto-run by Codespaces)
+README.md              # You are here
 ```
 
 ## Agentic Workflow Strategy
@@ -98,6 +112,12 @@ This repo implements a three-layer approach to AI-assisted development:
 **When to use**: Repeatable workflows that combine multiple skills/tools
 
 **Key principle**: Custom instructions set the baseline. Skills add capabilities. Agents orchestrate workflows. Use the lightest-weight solution for each need.
+
+### Claude Code Skills
+**Location**: `.claude/skills/*/SKILL.md`
+**Purpose**: Specialized skills for Claude Code, deployed via `install.sh` symlinks to `~/.claude/skills/`
+**Examples**: `design-review` (two-reviewer architecture review), `sync-dotfiles` (sync changes to personal GitHub), `serve-insights` (Codespaces utility)
+**Deployment**: Unlike Copilot agents/skills (auto-discovered), Claude Code skills require `install.sh` to symlink them into the Claude config directory
 
 ## Design Decisions
 
@@ -170,11 +190,20 @@ This repo contains **personal, universal** configuration. For work environments,
 
 ### Configuration Management
 
-All configuration lives in this repo, symlinked into `$HOME`:
+Configuration is deployed via symlinks or JSON merge, depending on the tool:
+
+**Symlinked** (changes reflect immediately):
 - `~/.zshrc` → `dotfiles/zsh/.zshrc`
 - `~/.p10k.zsh` → `dotfiles/zsh/.p10k.zsh`
 - `~/.gitconfig` → `dotfiles/git/.gitconfig`
-- `~/.vscode/settings.json` → `dotfiles/vscode/settings.json`
+- `~/.config/ghostty/config` → `dotfiles/ghostty/config`
+- `~/.claude/skills/*` → `dotfiles/.claude/skills/*`
+
+**JSON-merged** (dotfiles settings merged into existing config):
+- VS Code: merged into `~/.vscode-remote/` and `~/.vscode-server/` machine settings
+- Claude Code: `settings.json` merged into `~/.claude/settings.json`
+
+Note: `.claude/settings.local.json` is intentionally repo-scoped — read by Claude Code when working in this directory.
 
 **Why symlinks?** Changes to dotfiles repo immediately reflect in active environment. No sync needed. One source of truth.
 
@@ -188,30 +217,29 @@ Edit `apt-packages.txt`, add package names (one per line), rerun `./install.sh`.
 
 Edit `zsh/.zshrc` or `zsh/.p10k.zsh`, then reload: `source ~/.zshrc`
 
-### Creating New Agents
+### Creating New Copilot Agents/Skills
 
-1. Create `.github/agents/my-agent.md`
-2. Add YAML frontmatter with `name`, `description`, `tools`, `infer`
-3. Write agent instructions in markdown body
-4. Rerun `./install.sh` to deploy
+Copilot agents and skills are auto-discovered from `.github/` — no install step needed.
+
+1. Create `.github/agents/my-agent.md` or `.github/skills/my-skill/SKILL.md`
+2. Add YAML frontmatter with `name`, `description` (and `tools`, `infer` for agents)
+3. Write instructions in markdown body
 
 See [`.github/agents/readability-reviewer.md`](.github/agents/readability-reviewer.md) for example.
 
-### Creating New Skills
+### Creating New Claude Code Skills
 
-1. Create `.github/skills/my-skill/SKILL.md`
-2. Add YAML frontmatter with `name`, `description`
-3. Write skill instructions, examples, best practices
-4. Optionally add scripts/references in skill directory
-5. Rerun `./install.sh` to deploy
+Claude Code skills require `install.sh` to symlink them into `~/.claude/skills/`.
 
-See [`.github/skills/readability/SKILL.md`](.github/skills/readability/SKILL.md) for example.
+1. Create `.claude/skills/my-skill/SKILL.md`
+2. Write skill instructions in markdown body
+3. Rerun `./install.sh` to deploy the symlink
 
 ## Development Workflow
 
 1. **Make changes** - Edit files in this repo
 2. **Run tests locally** - `bash tests/test-install.sh`
-3. **Lint** - `shellcheck install.sh scripts/*.sh tests/*.sh`
+3. **Lint** - `shellcheck install.sh tests/*.sh`
 4. **Commit and push** - CI runs automatically on PRs to `main`
 5. **Test in fresh Codespace** - Create new Codespace, verify everything works
 6. **Iterate** - Fix issues, repeat
@@ -240,7 +268,7 @@ All jobs run on `mcr.microsoft.com/devcontainers/universal` — the same base im
 bash tests/test-install.sh
 
 # Lint (requires shellcheck)
-shellcheck install.sh scripts/*.sh tests/*.sh
+shellcheck install.sh tests/*.sh
 ```
 
 ## Troubleshooting
