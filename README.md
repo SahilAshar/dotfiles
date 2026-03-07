@@ -52,7 +52,6 @@ The installer is fully idempotent - safe to run multiple times.
 ```
 .claude/
   settings.json        # Claude Code settings (merged into ~/.claude/)
-  settings.local.json  # Repo-scoped Claude Code settings (not committed, read by Claude Code when working here)
   statusline-command.sh # Claude Code statusline script
   skills/              # Claude Code skills (symlinked into ~/.claude/skills/)
     design-review/
