@@ -31,7 +31,7 @@ Modern development increasingly happens *with* AI agents in ephemeral cloud envi
 
 **Codespaces-first design**: Everything assumes `/workspaces/.codespaces/.persistedshare/dotfiles` as the clone location. Automatic execution via `install.sh`. Idempotent reruns.
 
-**`install.sh` execution flow**: Calls discrete functions in order: `install_apt_packages` → `install_ohmyzsh` → `install_powerlevel10k` → `install_zsh_autosuggestions` → `link_file` (symlinks) → `deploy_copilot_prompts`. Each function is independently idempotent — checks if work is already done before acting.
+**`install.sh` execution flow**: Calls discrete functions in order: `install_apt_packages` → `install_ohmyzsh` → `install_powerlevel10k` → `install_zsh_autosuggestions` → `link_file` (symlinks) → `deploy_claude_settings` → `install_claude_code` → `deploy_vscode_settings`. Each function is independently idempotent — checks if work is already done before acting. Copilot agents/skills in `.github/` are auto-discovered, not deployed.
 
 **Symlink strategy**: Config files live in this repo and are symlinked into `$HOME` via the `link_file` helper. It backs up existing files to `.bak`, skips if symlink already points correctly, and fails if a `.bak` already exists (requires manual resolution).
 
@@ -51,7 +51,7 @@ Modern development increasingly happens *with* AI agents in ephemeral cloud envi
 bash tests/test-install.sh
 
 # Lint all shell scripts
-shellcheck install.sh scripts/*.sh tests/*.sh
+shellcheck install.sh tests/*.sh
 
 # Integration test in Docker (mimics Codespaces base image)
 docker run -it --rm -v "$(pwd):/dotfiles" mcr.microsoft.com/devcontainers/universal:latest bash -c "cd /dotfiles && ./install.sh"
@@ -76,8 +76,8 @@ docs/
   TODO.md              # Prioritized improvement backlog
 git/
   .gitconfig          # Git configuration template
-scripts/
-  install-prompts.sh  # No-op placeholder; discovers agents/skills in .github/
+ghostty/
+  config              # Ghostty terminal configuration
 tests/
   test-install.sh     # 22 unit tests (static analysis + sandboxed behavioral tests)
 zsh/
