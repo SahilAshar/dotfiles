@@ -14,7 +14,7 @@ Priority-ordered checklist for evolving this dotfiles repository.
   - [ ] Can suggest improvements to shell configs
   - [ ] Uses `readability` skill for script review
 
-- [ ] **Create shell-scripting skill** (`.github/skills/shell-scripting/SKILL.md`)
+- [ ] **Create shell-scripting skill** (`.claude/skills/shell-scripting/SKILL.md`)
   - [ ] Best practices for bash scripts
   - [ ] Common patterns (checking commands, backups, idempotency)
   - [ ] Error handling templates
@@ -57,11 +57,20 @@ Priority-ordered checklist for evolving this dotfiles repository.
   - [ ] Document manual vs automatic approach
 
 ### P4: Agent/Skill Expansion
+- [x] **Unify skills under `.claude/skills/`** (2026-03-07)
+  - [x] Migrated `readability` and `session-log` from `.github/skills/` to `.claude/skills/`
+  - [x] Removed `.github/skills/` directory
+  - [x] Updated all docs references
+- [x] **Create universal development skills** (2026-03-07)
+  - [x] `pr-description` - PR description writer from git diffs
+  - [x] `debug` - Systematic debugging methodology
+  - [x] `test-strategy` - Test strategy planner
+  - [x] `refactor` - Safe, incremental refactor planner
 - [ ] **Create additional universal skills**
   - [ ] `git-workflow` - Git best practices and patterns
   - [ ] `markdown-editing` - Markdown formatting standards
   - [ ] `documentation` - How to document code/repos
-  
+
 - [ ] **Create specialized agents for common tasks**
   - [ ] `config-reviewer` - Reviews dotfiles changes
   - [ ] `environment-debugger` - Helps debug shell/env issues

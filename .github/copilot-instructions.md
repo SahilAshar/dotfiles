@@ -37,7 +37,7 @@ Modern development increasingly happens *with* AI agents in ephemeral cloud envi
 
 **Agentic workflow strategy**:
 - **Universal agents** (`.github/agents/`): Portable across all workspaces (e.g., `readability-reviewer.md`)
-- **Universal skills** (`.github/skills/`): Reusable capabilities (e.g., `readability/`)
+- **Universal skills** (`.claude/skills/`): Canonical skill home, symlinked globally via `install.sh` (e.g., `readability/`, `debug/`, `pr-description/`)
 - **Custom instructions** (`.github/copilot-instructions.md`): Always-on repo guidance
 - **Workspace-specific agents**: Generated per-repo via automation (future goal)
 
@@ -69,7 +69,6 @@ No way to run a single test — `tests/test-install.sh` is one script with inlin
 ```
 .github/
   agents/              # Universal agents (portable across workspaces)
-  skills/              # Universal skills (Copilot + Claude compatible)
   workflows/ci.yml     # CI pipeline (lint + test + integration)
   copilot-instructions.md  # This file (always-on guidance)
 docs/
@@ -136,7 +135,7 @@ GitHub Actions (`.github/workflows/ci.yml`) runs on every push to `main` and eve
 - Include `agent` tool if agent might invoke skills
 - Focus on *workflow orchestration*, not specific tasks
 
-**When creating skills** (`.github/skills/*/SKILL.md`):
+**When creating skills** (`.claude/skills/*/SKILL.md`):
 - Rich `description` with trigger keywords
 - Concrete examples with before/after code
 - Action-oriented instructions ("do X when Y")

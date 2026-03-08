@@ -53,18 +53,21 @@ The installer is fully idempotent - safe to run multiple times.
 .claude/
   settings.json        # Claude Code settings (merged into ~/.claude/)
   statusline-command.sh # Claude Code statusline script
-  skills/              # Claude Code skills (symlinked into ~/.claude/skills/)
-    design-review/
-    review-bottom-up/
-    review-top-down/
-    serve-insights/
-    sync-dotfiles/
+  skills/              # Universal skills (symlinked into ~/.claude/skills/)
+    debug/             # Systematic debugging methodology
+    design-review/     # Two-reviewer architecture review
+    pr-description/    # PR description writer from git diffs
+    readability/       # Readability-focused code review
+    refactor/          # Safe, incremental refactor planner
+    review-bottom-up/  # Bottom-up implementation review
+    review-top-down/   # Top-down caller perspective review
+    serve-insights/    # Codespaces utility
+    session-log/       # Session documentation
+    sync-dotfiles/     # Sync changes to personal GitHub
+    test-strategy/     # Test strategy planner
 .github/
   agents/              # Universal Copilot agents (work across all repos)
     readability-reviewer.md
-  skills/              # Universal Copilot skills (capabilities for agents)
-    readability/
-      SKILL.md
   copilot-instructions.md  # Always-on guidance (applies to all tasks)
   workflows/
     ci.yml             # Three-stage CI pipeline (lint + test + integration)
@@ -97,11 +100,11 @@ This repo implements a three-layer approach to AI-assisted development:
 **Behavior**: Passive but persistent - automatically loaded
 
 ### Layer 2: Skills (Conditional Capabilities)
-**Location**: `.github/skills/*/SKILL.md`  
-**Purpose**: Reusable, specialized capabilities Copilot loads on-demand  
-**Examples**: `readability` (code review heuristics), `shell-scripting` (bash best practices)  
-**Behavior**: Copilot decides when to load based on task relevance  
-**Portability**: Works across Copilot CLI, coding agent, and VS Code
+**Location**: `.claude/skills/*/SKILL.md`
+**Purpose**: Reusable, specialized capabilities loaded on-demand
+**Examples**: `readability` (code review heuristics), `debug` (systematic debugging), `pr-description` (PR writer)
+**Behavior**: Agent decides when to load based on task relevance
+**Deployment**: Symlinked into `~/.claude/skills/` via `install.sh` for global availability
 
 ### Layer 3: Agents (Workflow Orchestrators)
 **Location**: `.github/agents/*.md`  
@@ -114,9 +117,9 @@ This repo implements a three-layer approach to AI-assisted development:
 
 ### Claude Code Skills
 **Location**: `.claude/skills/*/SKILL.md`
-**Purpose**: Specialized skills for Claude Code, deployed via `install.sh` symlinks to `~/.claude/skills/`
-**Examples**: `design-review` (two-reviewer architecture review), `sync-dotfiles` (sync changes to personal GitHub), `serve-insights` (Codespaces utility)
-**Deployment**: Unlike Copilot agents/skills (auto-discovered), Claude Code skills require `install.sh` to symlink them into the Claude config directory
+**Purpose**: All skills live here as the canonical home, deployed via `install.sh` symlinks to `~/.claude/skills/`
+**Examples**: `design-review` (two-reviewer architecture review), `debug` (systematic debugging), `test-strategy` (test planner), `refactor` (safe refactor planning), `pr-description` (PR writer)
+**Deployment**: `install.sh` symlinks each skill directory into `~/.claude/skills/` for global availability across all repos
 
 ## Design Decisions
 
@@ -216,23 +219,25 @@ Edit `apt-packages.txt`, add package names (one per line), rerun `./install.sh`.
 
 Edit `zsh/.zshrc` or `zsh/.p10k.zsh`, then reload: `source ~/.zshrc`
 
-### Creating New Copilot Agents/Skills
+### Creating New Copilot Agents
 
-Copilot agents and skills are auto-discovered from `.github/` — no install step needed.
+Copilot agents are auto-discovered from `.github/agents/` — no install step needed.
 
-1. Create `.github/agents/my-agent.md` or `.github/skills/my-skill/SKILL.md`
+1. Create `.github/agents/my-agent.md` (for Copilot agents)
 2. Add YAML frontmatter with `name`, `description` (and `tools`, `infer` for agents)
 3. Write instructions in markdown body
 
 See [`.github/agents/readability-reviewer.md`](.github/agents/readability-reviewer.md) for example.
 
-### Creating New Claude Code Skills
+### Creating New Skills
 
-Claude Code skills require `install.sh` to symlink them into `~/.claude/skills/`.
+All skills live in `.claude/skills/` and are deployed globally via `install.sh`.
 
 1. Create `.claude/skills/my-skill/SKILL.md`
-2. Write skill instructions in markdown body
-3. Rerun `./install.sh` to deploy the symlink
+2. Add YAML frontmatter with `name` and `description` (include trigger keywords)
+3. Write instructions in markdown body
+4. Rerun `./install.sh` to deploy the symlink
+
 
 ## Development Workflow
 
@@ -281,7 +286,7 @@ shellcheck install.sh tests/*.sh
 
 ### Agents/skills not appearing in Copilot
 
-1. Agents/skills are auto-discovered from `.github/agents/` and `.github/skills/` when working in this repo
+1. Agents are auto-discovered from `.github/agents/` when working in this repo; skills are in `.claude/skills/` and deployed via `install.sh`
 2. Reload VS Code window: `Cmd+Shift+P` → "Reload Window"
 3. Check Copilot status: `@workspace /help`
 4. Wait 5-10 minutes for indexing
