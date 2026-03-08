@@ -115,12 +115,6 @@ This repo implements a three-layer approach to AI-assisted development:
 
 **Key principle**: Custom instructions set the baseline. Skills add capabilities. Agents orchestrate workflows. Use the lightest-weight solution for each need.
 
-### Claude Code Skills
-**Location**: `.claude/skills/*/SKILL.md`
-**Purpose**: All skills live here as the canonical home, deployed via `install.sh` symlinks to `~/.claude/skills/`
-**Examples**: `design-review` (two-reviewer architecture review), `debug` (systematic debugging), `test-strategy` (test planner), `refactor` (safe refactor planning), `pr-description` (PR writer)
-**Deployment**: `install.sh` symlinks each skill directory into `~/.claude/skills/` for global availability across all repos
-
 ## Design Decisions
 
 ### Why Codespaces-First?

@@ -67,6 +67,8 @@ No way to run a single test — `tests/test-install.sh` is one script with inlin
 
 ## Project Structure
 ```
+.claude/
+  skills/              # Universal skills (canonical home, symlinked globally)
 .github/
   agents/              # Universal agents (portable across workspaces)
   workflows/ci.yml     # CI pipeline (lint + test + integration)
