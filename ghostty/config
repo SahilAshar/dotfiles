@@ -1,1 +1,18 @@
+# Font
+font-family = JetBrains Mono
+font-size = 14
+
+# Theme (VS Code Dark Modern aesthetic)
+# Run: ghostty +list-themes | grep -i vscode  to confirm available names
+theme = dark:VSCode_Dark_Modern,light:VSCode_Light_Modern
+
+# Cursor
+cursor-style = bar
+cursor-style-blink = false
+
+# Window
+window-padding-x = 4
+window-padding-y = 4
+
+# Keybinds
 keybind = shift+enter=text:\n

@@ -111,9 +111,20 @@ install_apt_packages() {
     fi
   fi
 
-  run_as_root apt-get install -y -qq "${missing_packages[@]}"
+  # Install packages individually so one failure doesn't block the rest
+  local failed_packages=()
+  for package in "${missing_packages[@]}"; do
+    if ! run_as_root apt-get install -y -qq "$package" >/dev/null 2>&1; then
+      echo "⚠ Could not install '$package' (not available in this distro's repos)"
+      failed_packages+=("$package")
+    fi
+  done
 
-  echo "✓ Packages installed"
+  if [ "${#failed_packages[@]}" -gt 0 ]; then
+    echo "⚠ Some packages unavailable: ${failed_packages[*]} (continuing anyway)"
+  else
+    echo "✓ All packages installed"
+  fi
 }
 
 # Install Oh My Zsh (if missing)
@@ -188,6 +199,29 @@ install_zsh_autosuggestions() {
   }
 
   echo "✓ zsh-autosuggestions installed"
+}
+
+# Install zsh-syntax-highlighting plugin (if missing)
+install_zsh_syntax_highlighting() {
+  local plugin_dir="$HOME/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting"
+
+  if [ -d "$plugin_dir" ]; then
+    echo "✓ zsh-syntax-highlighting already installed"
+    return
+  fi
+
+  if ! command -v git >/dev/null 2>&1; then
+    echo "✗ ERROR: git is required to install zsh-syntax-highlighting" >&2
+    exit 1
+  fi
+
+  echo "→ Installing zsh-syntax-highlighting..."
+  git clone https://github.com/zsh-users/zsh-syntax-highlighting.git "$plugin_dir" || {
+    echo "✗ zsh-syntax-highlighting installation failed" >&2
+    exit 1
+  }
+
+  echo "✓ zsh-syntax-highlighting installed"
 }
 
 # Link dotfiles into home directory
@@ -341,7 +375,11 @@ main() {
   install_zsh_autosuggestions
   echo ""
 
+  install_zsh_syntax_highlighting
+  echo ""
+
   echo "→ Linking shell configuration files..."
+  link_file "bash/.bashrc" ".bashrc"
   link_file "zsh/.zshrc" ".zshrc"
 
   if [ -f "$DOTFILES_DIR/zsh/.p10k.zsh" ]; then
@@ -354,6 +392,10 @@ main() {
 
   if [ -f "$DOTFILES_DIR/ghostty/config" ]; then
     link_file "ghostty/config" ".config/ghostty/config"
+  fi
+
+  if [ -f "$DOTFILES_DIR/tmux/.tmux.conf" ]; then
+    link_file "tmux/.tmux.conf" ".tmux.conf"
   fi
 
   deploy_claude_settings
