@@ -74,6 +74,42 @@ else
   fail "Links git/.gitconfig into home when present" "Missing git config symlink call"
 fi
 
+# Test: install.sh links bash/.bashrc
+if grep -q 'link_file "bash/.bashrc" ".bashrc"' "$INSTALL_SH"; then
+  pass "Links bash/.bashrc into home"
+else
+  fail "Links bash/.bashrc into home" "Missing bashrc symlink call"
+fi
+
+# Test: bash/.bashrc exists and has safety guards
+BASHRC_FILE="$REPO_ROOT/bash/.bashrc"
+if [ -f "$BASHRC_FILE" ] && grep -q 'ZSH_VERSION' "$BASHRC_FILE" && grep -q 'command -v zsh' "$BASHRC_FILE"; then
+  pass "bash/.bashrc exists with zsh trampoline safety guards"
+else
+  fail "bash/.bashrc exists with zsh trampoline safety guards" "Missing file or safety guards"
+fi
+
+# Test: install.sh links tmux/.tmux.conf
+if grep -q 'link_file "tmux/.tmux.conf" ".tmux.conf"' "$INSTALL_SH"; then
+  pass "Links tmux/.tmux.conf into home"
+else
+  fail "Links tmux/.tmux.conf into home" "Missing tmux.conf symlink call"
+fi
+
+# Test: install.sh installs zsh-syntax-highlighting
+if grep -q 'install_zsh_syntax_highlighting' "$INSTALL_SH"; then
+  pass "Calls install_zsh_syntax_highlighting during install"
+else
+  fail "Calls install_zsh_syntax_highlighting during install" "Missing install_zsh_syntax_highlighting call"
+fi
+
+# Test: zsh-syntax-highlighting checks for existing directory (idempotent)
+if grep -A5 'install_zsh_syntax_highlighting()' "$INSTALL_SH" | grep -q '\-d.*plugin_dir'; then
+  pass "zsh-syntax-highlighting: checks if already installed before cloning"
+else
+  fail "zsh-syntax-highlighting: checks if already installed" "No directory check found"
+fi
+
 # Test: install.sh deploys Claude statusline script via deploy_claude_settings
 if grep -q 'statusline-command.sh' "$INSTALL_SH" && grep -q 'deploy_claude_settings' "$INSTALL_SH"; then
   pass "Deploys .claude/statusline-command.sh via deploy_claude_settings"

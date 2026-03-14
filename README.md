@@ -18,8 +18,8 @@
 When you create a Codespace with this dotfiles repo configured:
 
 1. **Installs packages** - `zsh`, `ripgrep`, and other essentials (Linux only)
-2. **Configures shell** - Sets up zsh with Oh My Zsh, Powerlevel10k theme, and autosuggestions
-3. **Links configurations** - Symlinks `.zshrc`, `.p10k.zsh`, `.gitconfig`, VS Code settings
+2. **Configures shell** - Sets up zsh with Oh My Zsh, Powerlevel10k theme, autosuggestions, and syntax highlighting
+3. **Links configurations** - Symlinks `.bashrc`, `.zshrc`, `.p10k.zsh`, `.gitconfig`, `.tmux.conf`, VS Code settings
 4. **Deploys agentic workflows** - Copilot agents/skills are auto-discovered from `.github/`; Claude Code skills are symlinked into `~/.claude/skills/`
 
 **Total time**: ~30 seconds on a fresh Codespace.  
@@ -73,10 +73,14 @@ The installer is fully idempotent - safe to run multiple times.
     ci.yml             # Three-stage CI pipeline (lint + test + integration)
 docs/
   TODO.md              # Prioritized improvement checklist
+bash/
+  .bashrc              # Bash → zsh trampoline (auto-switches to zsh)
 ghostty/
   config               # Ghostty terminal configuration
 git/
   .gitconfig           # Git configuration template
+tmux/
+  .tmux.conf           # tmux configuration for SSH persistence
 tests/
   test-install.sh      # 22+ tests for install.sh
 vscode/
@@ -189,9 +193,11 @@ This repo contains **personal, universal** configuration. For work environments,
 Configuration is deployed via symlinks or JSON merge, depending on the tool:
 
 **Symlinked** (changes reflect immediately):
+- `~/.bashrc` → `dotfiles/bash/.bashrc`
 - `~/.zshrc` → `dotfiles/zsh/.zshrc`
 - `~/.p10k.zsh` → `dotfiles/zsh/.p10k.zsh`
 - `~/.gitconfig` → `dotfiles/git/.gitconfig`
+- `~/.tmux.conf` → `dotfiles/tmux/.tmux.conf`
 - `~/.config/ghostty/config` → `dotfiles/ghostty/config`
 - `~/.claude/skills/*` → `dotfiles/.claude/skills/*`
 
