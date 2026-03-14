@@ -114,8 +114,8 @@ install_apt_packages() {
   # Install packages individually so one failure doesn't block the rest
   local failed_packages=()
   for package in "${missing_packages[@]}"; do
-    if ! run_as_root apt-get install -y -qq "$package" >/dev/null 2>&1; then
-      echo "⚠ Could not install '$package' (not available in this distro's repos)"
+    if ! run_as_root apt-get install -y -qq "$package" 2>&1 | tail -1; then
+      echo "⚠ Could not install '$package'"
       failed_packages+=("$package")
     fi
   done
@@ -216,7 +216,7 @@ install_zsh_syntax_highlighting() {
   fi
 
   echo "→ Installing zsh-syntax-highlighting..."
-  git clone https://github.com/zsh-users/zsh-syntax-highlighting.git "$plugin_dir" || {
+  git clone --depth=1 https://github.com/zsh-users/zsh-syntax-highlighting.git "$plugin_dir" || {
     echo "✗ zsh-syntax-highlighting installation failed" >&2
     exit 1
   }

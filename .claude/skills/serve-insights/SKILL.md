@@ -11,11 +11,14 @@ After the user runs `/insights`, serve the generated HTML report via a local HTT
 
 ## Instructions
 
-1. Check if the insights report exists. Try both paths:
+1. Check if the insights report exists. Try both paths and set `REPORT_DIR` to the directory containing it:
    ```
-   ls ~/.claude/usage-data/report.html 2>/dev/null || ls /workarea/.claude_config/usage-data/report.html 2>/dev/null
+   if [ -f ~/.claude/usage-data/report.html ]; then
+     REPORT_DIR=~/.claude/usage-data
+   elif [ -f /workarea/.claude_config/usage-data/report.html ]; then
+     REPORT_DIR=/workarea/.claude_config/usage-data
+   fi
    ```
-   Use whichever path exists. Store it as `REPORT_DIR` for later steps.
    If neither exists, tell the user: "No insights report found. Run `/insights` first to generate one."
    Then stop.
 
