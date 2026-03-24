@@ -1,0 +1,81 @@
+# Skill: Research to One-Pager
+
+Convert an existing research document into a concise one-pager suitable for presenting to stakeholders. This skill covers the full lifecycle: drafting, iterative review, grounding claims with internal sources, and extending the document as new questions arise.
+
+## When to Use
+
+The user has a research document (design doc, investigation notes, competitive analysis) and needs to distill it into a presentation-ready one-pager for a specific audience — typically leadership, security reviewers, or cross-team stakeholders.
+
+## Invocation
+
+`/research-to-one-pager`
+
+## Workflow
+
+### Phase 1: Understand the Audience
+
+Before writing anything, identify:
+- **Who is the audience?** (e.g., security reviewers, leadership, partner team)
+- **What is their core question?** (e.g., "Can we use this securely?" not "How does this technology work?")
+- **What do they already know?** Avoid over-explaining terminology the audience is familiar with.
+
+Frame the entire document around answering the audience's question. The research exists to support your answer, not the other way around.
+
+### Phase 2: Draft the One-Pager
+
+Use this section order as a starting point:
+
+1. **Context / Requirements** — Why are we evaluating this? What do we need it to do?
+2. **What Is It** — Brief explanation of the technology or approach (1-2 paragraphs max)
+3. **How It Meets Requirements** — Map capabilities to requirements. Use a table.
+4. **Gaps and Risks** — What it does NOT solve. Do not bury these.
+5. **Next Steps** — Concrete actions with owners if possible.
+
+Key formatting guidelines:
+- Use **tables** for requirement-to-capability mappings and comparisons. They are scannable and prevent wall-of-text.
+- Keep sections short. If a section exceeds half a page, it needs trimming.
+- Lead with conclusions, not with process. Say what the answer is, then support it.
+
+### Phase 3: Ground Claims with Internal Sources
+
+Search for official documentation that supports claims in the one-pager:
+- Search for relevant standards, policies, and architectural guidelines.
+- Link to official sources so reviewers can verify claims independently.
+- Quote specific requirements or standards where they strengthen the argument.
+- If a claim cannot be grounded in an official source, flag it as an assumption.
+
+### Phase 4: Review Loop
+
+Expect multiple rounds of review. The typical cycle is:
+
+1. **Write draft** — Deliver the initial one-pager.
+2. **User reorganizes sections** — The user knows their audience better than you do. When they reorder, rename, or restructure sections, adopt their mental model going forward. Do not revert to the original structure.
+3. **Fix correctness** — Watch for:
+   - Technical inaccuracies (e.g., conflating related-but-distinct concepts like "separation of duties" vs. "least privilege")
+   - Missing or incorrect quotes from source material
+   - Redundant bullet points that say the same thing in different words
+   - Overly strong claims that the evidence does not fully support
+4. **User asks clarifying questions** — These questions reveal gaps in the document. Use them to improve the one-pager, not just to answer in conversation. Add the clarification directly into the document where relevant.
+5. **Iterate** until the user is satisfied.
+
+### Phase 5: Extend After Presentation
+
+The one-pager will evolve through the presentation itself. After the user presents:
+- New questions will come from the audience (e.g., "What about disaster recovery?" or "How does this compare to X?").
+- Research the answers using available documentation and sources.
+- Add new sections or expand existing ones to address these questions.
+- Maintain the same structure and tone as the rest of the document.
+
+## Anti-Patterns
+
+- **Leading with implementation details.** The audience wants to know if the solution meets their requirements, not how the internals work. Implementation details belong in an appendix or linked design doc.
+- **Burying risks at the bottom.** Gaps and risks should be prominent, not afterthoughts. Reviewers trust documents that are upfront about limitations.
+- **Over-explaining known terminology.** If the audience already knows what "encryption at rest" means, do not define it. One sentence of context is fine; a paragraph is not.
+- **Treating the one-pager as a static artifact.** It is a living document that should grow as new questions surface. Build it to be extendable.
+- **Ignoring the user's structural preferences.** When the user moves sections around, they are telling you how they think about the problem. Follow their lead.
+
+## Example Prompts
+
+- "I have a research doc at docs/my-research.md. Help me turn it into a one-pager for the security review."
+- "We need to present this to leadership. What should the one-pager look like?"
+- "After the presentation, they asked about disaster recovery. Add that to the one-pager."
