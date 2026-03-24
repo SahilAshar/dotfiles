@@ -1,6 +1,6 @@
 ---
 name: serve-insights
-description: Serve the Claude Code insights report locally via HTTP after running /insights. Designed for Codespace environments.
+description: Serve the Claude Code insights report locally via HTTP after running /insights. Designed for any environment including remote/Codespaces.
 disable-model-invocation: true
 allowed-tools: Bash, Read
 ---
@@ -22,15 +22,25 @@ After the user runs `/insights`, serve the generated HTML report via a local HTT
    If neither exists, tell the user: "No insights report found. Run `/insights` first to generate one."
    Then stop.
 
-2. Check if a server is already running on port 8080:
+2. Kill any existing process on port 8080 so we start clean. Try `fuser` first, fall back to `ss`+`kill`:
    ```
-   ss -ltn sport = :8080 | grep -q LISTEN
+   fuser -k 8080/tcp 2>/dev/null || {
+     PID=$(ss -tlnp sport = :8080 2>/dev/null | grep -oP 'pid=\K[0-9]+' | head -1)
+     [ -n "$PID" ] && kill "$PID" 2>/dev/null
+   }
    ```
-   If a server is already running, tell the user it's already being served and provide the clickable link: `http://localhost:8080/report.html`
+   Also clean up any stale PID file:
+   ```
+   rm -f "$REPORT_DIR/insights-server.pid" 2>/dev/null
+   ```
 
-3. Find a working Python binary. Do NOT assume `python3` is on PATH. Check in order:
+3. Find a working Python binary. Do NOT assume `python3` or `python` are on PATH. Search broadly:
    ```
-   PYTHON=$(command -v python3 2>/dev/null || command -v python 2>/dev/null)
+   PYTHON=$(
+     command -v python3 2>/dev/null ||
+     command -v python 2>/dev/null ||
+     find /opt /usr/local -maxdepth 4 -name 'python3.*' -type f ! -name '*-config' ! -name '*-gdb*' 2>/dev/null | sort -V | tail -1
+   )
    ```
    If no Python is found, tell the user: "No Python binary found. Cannot start HTTP server."
    Then stop.
@@ -50,7 +60,7 @@ After the user runs `/insights`, serve the generated HTML report via a local HTT
 
 6. Tell the user:
    - The report is live at: `http://localhost:8080/report.html`
-   - If in a remote/Codespaces environment, check the **Ports** tab and use the forwarded URL with `/report.html` appended
+   - If in a remote/SSH environment, they may need to set up port forwarding (e.g., `ssh -L 8080:localhost:8080 <host>`) or check the **Ports** tab in their IDE
    - Let you know when they're done so you can stop the server
 
 7. When the user says they're done, stop the server cleanly:
