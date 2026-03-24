@@ -2,9 +2,9 @@
 font-family = JetBrains Mono
 font-size = 14
 
-# Theme (VS Code Dark Modern aesthetic)
-# Run: ghostty +list-themes | grep -i vscode  to confirm available names
-theme = dark:VsCode-Dark-Modern,light:VsCode-Light-Modern
+# Theme (Dark Modern)
+# Run: ghostty +list-themes | grep -i "dark modern"  to confirm available names
+theme = Dark Modern
 
 # Cursor
 cursor-style = bar
