@@ -308,7 +308,9 @@ deploy_claude_settings() {
   local src="$DOTFILES_DIR/.claude/settings.json"
   if [ -f "$src" ]; then
     local dest="$claude_config_dir/settings.json"
-    if ! command -v jq >/dev/null 2>&1; then
+    if [ "$(readlink -f "$src")" = "$(readlink -f "$dest")" ] 2>/dev/null; then
+      echo "✓ Claude settings already in place (same path): $dest"
+    elif ! command -v jq >/dev/null 2>&1; then
       echo "⚠ Warning: jq not available; skipping Claude settings merge" >&2
     elif [ -f "$dest" ]; then
       local merged
@@ -326,9 +328,14 @@ deploy_claude_settings() {
   # Deploy statusline script if present
   local statusline_src="$DOTFILES_DIR/.claude/statusline-command.sh"
   if [ -f "$statusline_src" ]; then
-    cp "$statusline_src" "$claude_config_dir/statusline-command.sh"
-    chmod +x "$claude_config_dir/statusline-command.sh"
-    echo "✓ Deployed Claude statusline script to $claude_config_dir/statusline-command.sh"
+    local statusline_dest="$claude_config_dir/statusline-command.sh"
+    if [ "$(readlink -f "$statusline_src")" = "$(readlink -f "$statusline_dest")" ] 2>/dev/null; then
+      echo "✓ Claude statusline already in place (same path): $statusline_dest"
+    else
+      cp "$statusline_src" "$statusline_dest"
+      chmod +x "$statusline_dest"
+      echo "✓ Deployed Claude statusline script to $statusline_dest"
+    fi
   fi
 }
 
