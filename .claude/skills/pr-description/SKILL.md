@@ -1,6 +1,7 @@
 ---
 name: pr-description
 description: 'Generate structured PR descriptions from git diffs. Use when the user asks to write a PR description, is about to open a PR, or wants help summarizing changes for review.'
+disable-model-invocation: true
 ---
 
 # PR Description Writer

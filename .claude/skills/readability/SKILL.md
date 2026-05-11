@@ -1,6 +1,7 @@
 ---
 name: readability
 description: 'Apply readability heuristics to code. Use when reviewing code for clarity, identifying confusing patterns, suggesting simplifications, or when asked about code comprehension, function complexity, variable naming, or repeated patterns.'
+disable-model-invocation: true
 ---
 
 # Readability Code Review Skill

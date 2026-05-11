@@ -1,6 +1,7 @@
 ---
 name: test-strategy
 description: 'Plan what tests to write for code. Use when the user asks what tests to write, how to test something, wants a test plan, or is unsure about test coverage for new or existing code.'
+disable-model-invocation: true
 ---
 
 # Test Strategy Planner

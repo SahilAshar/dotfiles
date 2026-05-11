@@ -2,6 +2,7 @@
 name: review-top-down
 description: 'Review a design or codebase from the top-down caller perspective. Evaluates the consumer experience, API contracts, breaking changes, layer complexity, and edge cases. Use when you want to validate that a design makes sense to its callers.'
 allowed-tools: Task, Read, Glob, Grep, Bash, AskUserQuestion
+disable-model-invocation: true
 ---
 
 # Top-Down Design Review

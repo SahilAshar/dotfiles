@@ -1,6 +1,7 @@
 ---
 name: refactor
 description: 'Plan safe, incremental refactors with rollback points. Use when the user wants to refactor code, restructure a module, break up a large file, rename across a codebase, or make a big structural change safely.'
+disable-model-invocation: true
 ---
 
 # Refactor Planner

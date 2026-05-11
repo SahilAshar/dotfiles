@@ -1,6 +1,7 @@
 ---
 name: session-log
 description: 'Create structured session logs for AI coding/chat sessions. Use when starting a new development session, tracking decisions and context, documenting troubleshooting, or preserving conversation history for future reference.'
+disable-model-invocation: true
 ---
 
 # Session Log Skill
