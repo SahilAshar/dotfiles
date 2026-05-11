@@ -2,6 +2,7 @@
 name: sync-dotfiles
 description: Sync local dotfiles changes back to the personal GitHub repo (SahilAshar/dotfiles) after reviewing for enterprise leaks. Handles leak scanning, selective staging, PAT auth, and PR creation.
 allowed-tools: Bash, Read, Grep, Glob, AskUserQuestion
+disable-model-invocation: true
 ---
 
 # Sync Dotfiles to Personal GitHub

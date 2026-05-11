@@ -2,6 +2,7 @@
 name: review-bottom-up
 description: 'Review a design or codebase from the bottom-up implementation perspective. Traces how changes bubble up from the lowest layer (data stores, SDKs, protocols) through the stack. Use when you want to validate that a design is actually implementable against the real infrastructure.'
 allowed-tools: Task, Read, Glob, Grep, Bash, AskUserQuestion
+disable-model-invocation: true
 ---
 
 # Bottom-Up Design Review

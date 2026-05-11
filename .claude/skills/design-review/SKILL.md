@@ -2,6 +2,7 @@
 name: design-review
 description: 'Launch a comprehensive design review with two parallel reviewers (top-down caller perspective + bottom-up implementation perspective), then synthesize their findings into actionable recommendations. Use for any significant design doc, architecture change, or multi-component refactor.'
 allowed-tools: Task, Read, Glob, Grep, Bash, AskUserQuestion
+disable-model-invocation: true
 ---
 
 # Design Review Orchestrator

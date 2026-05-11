@@ -1,6 +1,7 @@
 ---
 name: debug
 description: 'Systematic debugging methodology. Use when the user is stuck on a bug, encountering an error, asking for help debugging, or shotgun-debugging without progress.'
+disable-model-invocation: true
 ---
 
 # Systematic Debugger
