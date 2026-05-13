@@ -1,6 +1,6 @@
 ---
 name: sync-skill-stats
-description: Fire-and-forget skill invocation logger. Captures every Skill tool call to a local JSONL via a PostToolUse hook, syncs the log to a private GitHub repo (SahilAshar/skill-stats), and provides ad-hoc query modes. Modes:\setup (install hook),\sync (push log),\pull (fetch latest),\stats (query).
+description: Fire-and-forget skill invocation logger. Captures every Skill tool call to a local JSONL via a PostToolUse hook, syncs the log to a private GitHub repo (SahilAshar/skill-stats), and provides ad-hoc query modes. Modes — setup (install hook), sync (push log), pull (fetch latest), stats (query).
 allowed-tools: Bash, Read, Edit, Write, Grep, Glob, AskUserQuestion
 disable-model-invocation: true
 ---
@@ -28,16 +28,41 @@ Pick a mode from the user's invocation argument: `setup`, `sync`, `pull`, or `st
 
 ## Mode: `setup`
 
-Install the hook so logging starts. Runs once per machine.
+Install the hook so logging starts. Runs once per machine. Safe to re-run — idempotent.
 
-1. **Verify `jq` is installed.** Run `which jq`. If missing, tell the user and stop.
+1. **Verify `jq` is installed.** Run `which jq`. If missing, tell the user (e.g., `brew install jq` on macOS, `apt-get install jq` on Linux) and stop.
 
-2. **Ensure log script is executable.** Run `chmod +x ~/dotfiles/.claude/skills/sync-skill-stats/log.sh`.
+2. **Resolve the absolute path to `log.sh` dynamically.** Do NOT hardcode `/Users/...` or any specific path — the dotfiles checkout location varies across machines (`~/dotfiles` on macOS, `/workspaces/dotfiles` in Codespaces, etc.).
+   ```bash
+   # Try, in order: DOTFILES_DIR env var, ~/dotfiles, /workspaces/dotfiles
+   for candidate in "$DOTFILES_DIR" "$HOME/dotfiles" "/workspaces/dotfiles"; do
+     [ -z "$candidate" ] && continue
+     hook_candidate="$candidate/.claude/skills/sync-skill-stats/log.sh"
+     if [ -f "$hook_candidate" ]; then
+       HOOK_PATH=$(cd "$(dirname "$hook_candidate")" && pwd)/log.sh
+       break
+     fi
+   done
+   ```
+   If none resolved, ask the user where their dotfiles checkout lives.
 
-3. **Install the PostToolUse hook in `~/.claude/settings.json`.**
+3. **Ensure log script is executable.** `chmod +x "$HOOK_PATH"`.
+
+4. **Back up `~/.claude/settings.json` before editing.**
+   ```bash
+   if [ -f ~/.claude/settings.json ]; then
+     cp ~/.claude/settings.json ~/.claude/settings.json.bak.$(date +%Y%m%d-%H%M%S)
+   fi
+   ```
+   Tell the user where the backup landed.
+
+5. **Install the PostToolUse hook in `~/.claude/settings.json`.**
    - Read the existing `~/.claude/settings.json` (create with `{}` if missing).
-   - Add a `hooks.PostToolUse` entry with matcher `Skill` that runs `~/dotfiles/.claude/skills/sync-skill-stats/log.sh`.
-   - If a `PostToolUse` hook with matcher `Skill` already exists, do NOT duplicate. Show the user what's there and stop.
+   - Look for an existing `PostToolUse` entry with `matcher: "Skill"`:
+     - **None exists:** add a new entry pointing the command at `$HOOK_PATH`.
+     - **Ours already (command path matches a `*/sync-skill-stats/log.sh`):** update the command path in place to `$HOOK_PATH` (handles a moved dotfiles checkout). Tell the user it was refreshed.
+     - **Foreign hook on the `Skill` matcher (different command, not ours):** do NOT modify it. Show the user the conflict and stop — they need to merge manually.
+   - Use jq for the edit, not hand-rolled JSON, to preserve the rest of `settings.json` cleanly.
    - The merged structure should look like:
      ```json
      {
@@ -46,24 +71,28 @@ Install the hook so logging starts. Runs once per machine.
            {
              "matcher": "Skill",
              "hooks": [
-               { "type": "command", "command": "/Users/sahilashar/dotfiles/.claude/skills/sync-skill-stats/log.sh" }
+               { "type": "command", "command": "<absolute path to log.sh>" }
              ]
            }
          ]
        }
      }
      ```
-   - Use the absolute path (no `~`) — Claude Code does not always expand it.
+   - The command MUST be an absolute path (no `~`) — Claude Code does not always expand it.
 
-4. **Clone the private repo locally.**
+6. **Clone the private repo locally.**
    ```bash
    mkdir -p ~/.cache
-   git clone https://github.com/SahilAshar/skill-stats.git ~/.cache/claude-skill-stats
+   if [ -d ~/.cache/claude-skill-stats/.git ]; then
+     git -C ~/.cache/claude-skill-stats pull --rebase
+   else
+     git clone https://github.com/SahilAshar/skill-stats.git ~/.cache/claude-skill-stats
+   fi
    ```
-   If the directory already exists, run `git -C ~/.cache/claude-skill-stats pull` instead.
 
-5. **Confirm.** Tell the user:
-   - Hook installed
+7. **Confirm.** Tell the user:
+   - Hook installed at: `$HOOK_PATH`
+   - settings.json backup: `<backup path>`
    - Local log: `~/.claude/skill-usage.jsonl`
    - Clone: `~/.cache/claude-skill-stats`
    - Next: invoke a few skills, then run `/sync-skill-stats sync` to push the first batch.
