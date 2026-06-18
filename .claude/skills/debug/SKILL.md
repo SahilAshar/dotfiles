@@ -3,107 +3,132 @@ name: debug
 description: 'Systematic debugging methodology. Use when the user is stuck on a bug, encountering an error, asking for help debugging, or shotgun-debugging without progress.'
 ---
 
-# Systematic Debugger
+# Diagnosing Bugs
 
-A structured approach to debugging that prevents shotgun fixes and forces systematic narrowing to root cause.
+A discipline for hard bugs. Skip phases only when explicitly justified.
 
-## When to Use
+When exploring the codebase, read `CONTEXT.md` (if it exists) to get a clear mental model of the relevant modules, and check ADRs in the area you're touching.
 
-- User is stuck on a bug
-- User shares an error message and asks for help
-- User has been trying random fixes without progress
-- User asks "why isn't this working?"
+## Phase 1 — Build a feedback loop
 
-## The Debugging Loop
+**This is the skill.** Everything else is mechanical. If you have a **tight** pass/fail signal for the bug — one that goes red on _this_ bug — you will find the cause; bisection, hypothesis-testing, and instrumentation all just consume it. If you don't have one, no amount of staring at code will save you.
 
-### 1. Reproduce
+Spend disproportionate effort here. **Be aggressive. Be creative. Refuse to give up.**
 
-Before anything else, confirm you can reproduce the issue.
+### Ways to construct one — try them in roughly this order
 
-- **Get the exact error**: Full stack trace, error message, and context
-- **Get the exact steps**: What input, what command, what sequence triggers it?
-- **Confirm it's reproducible**: Does it happen every time? Only sometimes? Only in certain environments?
+1. **Failing test** at whatever seam reaches the bug — unit, integration, e2e.
+2. **Curl / HTTP script** against a running dev server.
+3. **CLI invocation** with a fixture input, diffing stdout against a known-good snapshot.
+4. **Headless browser script** (Playwright / Puppeteer) — drives the UI, asserts on DOM/console/network.
+5. **Replay a captured trace.** Save a real network request / payload / event log to disk; replay it through the code path in isolation.
+6. **Throwaway harness.** Spin up a minimal subset of the system (one service, mocked deps) that exercises the bug code path with a single function call.
+7. **Property / fuzz loop.** If the bug is "sometimes wrong output", run 1000 random inputs and look for the failure mode.
+8. **Bisection harness.** If the bug appeared between two known states (commit, dataset, version), automate "boot at state X, check, repeat" so you can `git bisect run` it.
+9. **Differential loop.** Run the same input through old-version vs new-version (or two configs) and diff outputs.
+10. **HITL bash script.** Last resort. If a human must click, drive _them_ with `scripts/hitl-loop.template.sh` so the loop is still structured. Captured output feeds back to you.
 
-If you can't reproduce it, you can't debug it. Focus here first.
+Build the right feedback loop, and the bug is 90% fixed.
 
-### 2. Isolate
+### Tighten the loop
 
-Narrow the problem space systematically.
+Treat the loop as a product. Once you have _a_ loop, **tighten** it:
 
-- **Read the error message carefully**: Most errors tell you exactly what's wrong. Read every word.
-- **Check recent changes**: `git diff` and `git log` — what changed since it last worked?
-- **Binary search**: If the cause isn't obvious, bisect. Comment out half the code, check if the error persists, narrow the half that matters.
-- **Simplify**: Create a minimal reproduction. Strip away everything that isn't necessary to trigger the bug.
+- Can I make it faster? (Cache setup, skip unrelated init, narrow the test scope.)
+- Can I make the signal sharper? (Assert on the specific symptom, not "didn't crash".)
+- Can I make it more deterministic? (Pin time, seed RNG, isolate filesystem, freeze network.)
 
-Key question: **What's the smallest change that triggers/fixes this?**
+A 30-second flaky loop is barely better than no loop; a 2-second deterministic one is tight — a debugging superpower.
 
-### 3. Hypothesize
+### Non-deterministic bugs
 
-Form a specific, testable hypothesis before making changes.
+The goal is not a clean repro but a **higher reproduction rate**. Loop the trigger 100×, parallelise, add stress, narrow timing windows, inject sleeps. A 50%-flake bug is debuggable; 1% is not — keep raising the rate until it's debuggable.
 
-- "I think X is happening because Y, and if I'm right, then Z should be true"
-- Write down the hypothesis — this prevents drift
-- If you can't form a hypothesis, you need more information (go back to step 2)
+### When you genuinely cannot build a loop
 
-Bad hypothesis: "Something is wrong with the API"
-Good hypothesis: "The API returns 401 because the token expires after 1 hour and we never refresh it"
+Stop and say so explicitly. List what you tried. Ask the user for: (a) access to whatever environment reproduces it, (b) a captured artifact (HAR file, log dump, core dump, screen recording with timestamps), or (c) permission to add temporary production instrumentation. Do **not** proceed to hypothesise without a loop.
 
-### 4. Verify
+### Completion criterion — a tight loop that goes red
 
-Test your hypothesis with the smallest possible change.
+Phase 1 is done when the loop is **tight** and **red-capable**: you can name **one command** — a script path, a test invocation, a curl — that you have **already run at least once** (paste the invocation and its output), and that is:
 
-- Make ONE change at a time
-- Predict the outcome before running the test
-- If your prediction is wrong, your hypothesis is wrong — go back to step 3
-- If your prediction is right, you've found the root cause
+- [ ] **Red-capable** — it drives the actual bug code path and asserts the **user's exact symptom**, so it can go red on this bug and green once fixed. Not "runs without erroring" — it must be able to _catch this specific bug_.
+- [ ] **Deterministic** — same verdict every run (flaky bugs: a pinned, high reproduction rate, per above).
+- [ ] **Fast** — seconds, not minutes.
+- [ ] **Agent-runnable** — you can run it unattended; a human in the loop only via `scripts/hitl-loop.template.sh`.
 
-### 5. Fix
+If you catch yourself reading code to build a theory before this command exists, **stop — jumping straight to a hypothesis is the exact failure this skill prevents.** No red-capable command, no Phase 2.
 
-Apply the fix and verify it's complete.
+## Phase 2 — Reproduce + minimise
 
-- Fix the root cause, not the symptom
-- Check for the same bug pattern elsewhere in the codebase
-- Write a regression test that would have caught this
-- Verify the original reproduction case now passes
+Run the loop. Watch it go red — the bug appears.
 
-## Common Debugging Patterns
+Confirm:
 
-### "It works on my machine"
-- Compare environments: versions, config, env vars, OS
-- Check: `node --version`, `python --version`, env-specific config files
-- Docker/container differences vs local
+- [ ] The loop produces the failure mode the **user** described — not a different failure that happens to be nearby. Wrong bug = wrong fix.
+- [ ] The failure is reproducible across multiple runs (or, for non-deterministic bugs, reproducible at a high enough rate to debug against).
+- [ ] You have captured the exact symptom (error message, wrong output, slow timing) so later phases can verify the fix actually addresses it.
 
-### "It worked yesterday"
-- `git log --oneline -20` — what changed?
-- `git bisect` to find the exact commit
-- Check external dependencies: did an API change? Did a package update?
+### Minimise
 
-### "It works sometimes"
-- Race condition: timing-dependent behavior
-- State leakage: previous test/request polluting state
-- Resource limits: memory, connections, file descriptors
-- Flaky external dependency
+Once it's red, shrink the repro to the **smallest scenario that still goes red**. Cut inputs, callers, config, data, and steps **one at a time**, re-running the loop after each cut — keep only what's load-bearing for the failure.
 
-### "No error, just wrong output"
-- Add logging at key decision points
-- Trace the data flow: input → transformation → output
-- Check assumptions: print intermediate values
-- Diff expected vs actual output carefully
+Why bother: a minimal repro shrinks the hypothesis space in Phase 3 (fewer moving parts left to suspect) and becomes the clean regression test in Phase 5.
 
-## Anti-Patterns to Avoid
+Done when **every remaining element is load-bearing** — removing any one of them makes the loop go green.
 
-- **Shotgun debugging**: Making random changes hoping something sticks
-- **Cargo cult fixes**: Copying a fix from Stack Overflow without understanding why it works
-- **Fix and forget**: Fixing the symptom without understanding the root cause
-- **Changing multiple things at once**: You won't know which change actually fixed it
-- **Ignoring the error message**: It almost always contains the answer
+Do not proceed until you have reproduced **and** minimised.
 
-## Guiding the User
+## Phase 3 — Hypothesise
 
-When helping someone debug:
+Generate **3–5 ranked hypotheses** before testing any of them. Single-hypothesis generation anchors on the first plausible idea.
 
-1. **Start by asking what they've already tried** — don't repeat failed approaches
-2. **Ask for the full error** — partial errors waste time
-3. **Ask what changed** — the bug was introduced somehow
-4. **Slow them down** — if they're frustrated, help them step back and be systematic
-5. **Teach the process** — don't just find the fix, help them learn to debug
+Each hypothesis must be **falsifiable**: state the prediction it makes.
+
+> Format: "If <X> is the cause, then <changing Y> will make the bug disappear / <changing Z> will make it worse."
+
+If you cannot state the prediction, the hypothesis is a vibe — discard or sharpen it.
+
+**Show the ranked list to the user before testing.** They often have domain knowledge that re-ranks instantly ("we just deployed a change to #3"), or know hypotheses they've already ruled out. Cheap checkpoint, big time saver. Don't block on it — proceed with your ranking if the user is AFK.
+
+## Phase 4 — Instrument
+
+Each probe must map to a specific prediction from Phase 3. **Change one variable at a time.**
+
+Tool preference:
+
+1. **Debugger / REPL inspection** if the env supports it. One breakpoint beats ten logs.
+2. **Targeted logs** at the boundaries that distinguish hypotheses.
+3. Never "log everything and grep".
+
+**Tag every debug log** with a unique prefix, e.g. `[DEBUG-a4f2]`. Cleanup at the end becomes a single grep. Untagged logs survive; tagged logs die.
+
+**Perf branch.** For performance regressions, logs are usually wrong. Instead: establish a baseline measurement (timing harness, `performance.now()`, profiler, query plan), then bisect. Measure first, fix second.
+
+## Phase 5 — Fix + regression test
+
+Write the regression test **before the fix** — but only if there is a **correct seam** for it.
+
+A correct seam is one where the test exercises the **real bug pattern** as it occurs at the call site. If the only available seam is too shallow (single-caller test when the bug needs multiple callers, unit test that can't replicate the chain that triggered the bug), a regression test there gives false confidence.
+
+**If no correct seam exists, that itself is the finding.** Note it. The codebase architecture is preventing the bug from being locked down. Flag this for the next phase.
+
+If a correct seam exists:
+
+1. Turn the minimised repro into a failing test at that seam.
+2. Watch it fail.
+3. Apply the fix.
+4. Watch it pass.
+5. Re-run the Phase 1 feedback loop against the original (un-minimised) scenario.
+
+## Phase 6 — Cleanup + post-mortem
+
+Required before declaring done:
+
+- [ ] Original repro no longer reproduces (re-run the Phase 1 loop)
+- [ ] Regression test passes (or absence of seam is documented)
+- [ ] All `[DEBUG-...]` instrumentation removed (`grep` the prefix)
+- [ ] Throwaway prototypes deleted (or moved to a clearly-marked debug location)
+- [ ] The hypothesis that turned out correct is stated in the commit / PR message — so the next debugger learns
+
+**Then ask: what would have prevented this bug?** If the answer involves architectural change (no good test seam, tangled callers, hidden coupling) hand off to the `/improve-codebase-architecture` skill with the specifics. Make the recommendation **after** the fix is in, not before — you have more information now than when you started.
