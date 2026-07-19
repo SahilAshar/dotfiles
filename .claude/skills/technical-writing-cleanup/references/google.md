@@ -11,8 +11,11 @@ Base guide for anything unspecified: Chicago Manual of Style + Merriam-Webster.
 Clear, friendly, developer-facing documentation. Unlike STE, Google style keeps
 a human, conversational register: contractions are fine, gerunds are fine
 ("Creating a bucket"), and there is **no closed dictionary** — only a blocklist
-of words to avoid. Preserve the author's warmth and voice; tighten and correct,
-don't sterilize.
+of words to avoid. Keep that register — second person, contractions, a light
+touch — while you cut filler, idioms, and hype. Note the honest limit: the
+blocklist and the global-audience rule will remove enthusiasm beats like
+"you're good to go!" and "simply," so the result reads *calmer and plainer*
+than the original, not more excited. Aim for clear and human, not peppy.
 
 ## Voice, tense, grammar
 
@@ -39,13 +42,14 @@ don't sterilize.
 | etc. | avoid | remove, or complete the list |
 | in order to | avoid | "to" |
 | via | caution | "with," "through," "by using" |
-| and/or | don't use | rewrite ("x or y, or both") |
+| and/or | avoid (OK in tight space, e.g. a table) | rewrite ("x or y, or both") |
 | allow (user capability) | avoid | "lets you" / "you can" |
 | kill / abort / terminate | avoid | "stop," "cancel," "exit," "end" |
 | hang | don't use | "stop responding" |
 | native | avoid | "built-in," "runs directly on" |
 | whitelist / blacklist | don't use | "allowlist" / "denylist" |
-| master / slave | don't use | "primary/replica," "main," "leader/follower" |
+| slave | don't use | "replica," "secondary," "follower" |
+| master | avoid (never paired with "slave") | "primary," "main," "leader," "original" |
 | sanity check | don't use | "quick check," "validation" |
 | dummy | don't use | "placeholder," "sample" |
 | he / she (generic) | don't use | singular **they** |
@@ -106,7 +110,7 @@ don't sterilize.
 |---|---|---|
 | "In order to simply deploy the app, just click here." | "To deploy the app, click **Deploy**." | *in order to*→to; drop *simply/just*; descriptive UI/link text |
 | "The file will be created by the system." | "The system creates the file." | active voice; present tense |
-| "Please note that this may fail." | "This deployment can fail if the quota is exceeded." | drop *please note*; fix ambiguous *this*; be specific |
+| "Please note that this may fail." | "This deployment can fail." | drop *please note*; fix ambiguous *this*; don't invent a cause the original didn't state |
 | "Users can utilize the API to fetch data, e.g. logs." | "You can use the API to fetch data, such as logs." | second person; *utilize*→use; *e.g.*→such as |
 | "Once it's done, it shows a message." | "After the build finishes, the console shows a message." | ambiguous *it* → specific antecedents |
 

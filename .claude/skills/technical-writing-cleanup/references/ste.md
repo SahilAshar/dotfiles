@@ -44,8 +44,9 @@ they should use `google` or the blended default instead.
 - Use one consistent spelling per word.
 
 ### 2. Noun clusters
-- **No noun cluster longer than 3 nouns.** Break longer stacks apart with
-  prepositions and articles.
+- **No noun cluster longer than 3 words** (articles and prepositions do not
+  count toward the limit). Break longer stacks apart with prepositions and
+  articles.
   - ✗ "runway light connection resistance calibration"
   - ✓ "calibration of the resistance in the connection for the runway lights"
 
@@ -68,7 +69,7 @@ they should use `google` or the blended default instead.
 - Keep articles (a, an, the) — do not write "telegraphically" ("Remove the
   bolt", not "Remove bolt").
 
-### 5. Procedures
+### 5. Procedural writing
 - Sequential steps become separate numbered instructions, each starting with a
   command verb.
 - No narrative, no passive.
@@ -80,13 +81,13 @@ they should use `google` or the blended default instead.
 - Present tense for permanent facts; simple past for events.
 - Logically ordered paragraphs, one topic each.
 
-### 7. Warnings and cautions
+### 7. Safety instructions (warnings and cautions)
 - Put the warning/caution **before** the step it applies to — never after.
 - Start with a clear command (what to do or not do), then give the reason.
   ("Do not touch the terminals. High voltage can kill you.")
 - Warning = risk to people. Caution = risk to equipment.
 
-### 8. Punctuation and word counts
+### 8. Punctuation and word count
 - Simple punctuation. Use colons and dashes for vertical/tabular layouts.
 - Avoid slashes and parentheses for essential meaning; avoid semicolons
   (prefer two sentences).
@@ -105,7 +106,7 @@ shortest, most common everyday word for the meaning.
 
 | Avoid | Use |
 |---|---|
-| commence, initiate | start / begin |
+| commence, initiate, begin | start |
 | terminate, cease | stop |
 | in order to | to |
 | prior to | before |
@@ -114,23 +115,33 @@ shortest, most common everyday word for the meaning.
 | utilize, employ | use |
 | assist | help |
 | obtain, procure | get |
-| sufficient, adequate | enough |
+| enough, adequate | sufficient |
 | approximately | about |
 | accomplish, perform, execute | do |
-| ascertain, verify, confirm, ensure, check | make sure (of) |
+| ascertain, verify, confirm, ensure | make sure (of) |
 | illumination | light |
 | endeavor, attempt | try |
 | in the event that | if |
 | a number of, numerous | many / several |
-| defective, inoperative | not correct / does not work |
-| de-energize | remove the electrical power |
-| depress (a button) | push / press |
+| defective | does not work |
+| inoperative | off |
+| depress (a button) | push |
 | additional | more |
-| component | part |
-| require | need |
+| require, need | necessary |
 | indicate | show |
 | permit | let |
 | retain | keep |
+
+Notes on the table:
+- STE approves the more formal word in several of these pairs on purpose — it
+  wants **sufficient** (not "enough") and **necessary** (not "need"). This is
+  the opposite direction from the blended/Google plain-word swaps, so when the
+  shared core and STE disagree, STE's choice wins in `ste-strict` mode.
+- The **verb** "check" is not approved (use *make sure*, *measure*, or *examine*
+  by sense), but the **noun** "check" is approved ("Do a check of the hydraulic
+  system"). Do not blanket-replace every "check."
+- **de-energize** and **component** are approved STE words with their own
+  meanings — keep them; do not substitute.
 
 ## Before → after (non-STE → STE)
 
@@ -139,7 +150,7 @@ shortest, most common everyday word for the meaning.
 | "The valve should be opened prior to commencing the test." | "Open the valve before you start the test." | active/imperative; *prior to*→before; *commence*→start |
 | "It is recommended that the operator verify that all connections are secure." | "Make sure that all the connections are tight." | one-word-one-meaning (*verify*→make sure); active; article |
 | "Removing the panel, disconnect the wiring harness." | "1. Remove the panel. 2. Disconnect the wiring harness." | no `-ing`; one action per sentence; sequential steps |
-| "Ensure adequate illumination in the vicinity of the work area." | "Make sure that there is enough light near the work area." | *ensure*→make sure; *adequate*→enough; *illumination*→light; *in the vicinity of*→near |
+| "Ensure adequate illumination in the vicinity of the work area." | "Make sure that there is sufficient light near the work area." | *ensure*→make sure; *adequate*→sufficient; *illumination*→light; *in the vicinity of*→near |
 | "The high-pressure fuel line pressure sensor calibration procedure is complex." | "The procedure to calibrate the pressure sensor for the high-pressure fuel line is difficult." | noun cluster >3; simpler words |
 | "Do not touch the wires after the power has been applied." | "Warning: Do not touch the wires. Electrical power can kill you." | warning before the step; command + reason |
 
@@ -149,7 +160,7 @@ shortest, most common everyday word for the meaning.
 - [ ] No `-ing` verb forms (except technical names).
 - [ ] No procedural sentence over 20 words; no descriptive sentence over 25.
 - [ ] No paragraph over 6 sentences.
-- [ ] No noun cluster over 3 nouns.
+- [ ] No noun cluster over 3 words.
 - [ ] One instruction per sentence; steps numbered where sequential.
 - [ ] Warnings/cautions before the step, command first then reason.
 - [ ] Unapproved words swapped for their approved equivalents.
