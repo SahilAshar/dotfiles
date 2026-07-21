@@ -81,6 +81,30 @@ gh api 'repos/hardikpandya/stop-slop/commits?since=2026-03-18' --jq '.[].sha'
 
 ---
 
+## ayghri/i-have-adhd
+
+**Repo**: https://github.com/ayghri/i-have-adhd
+**Pinned at**: `0241185` (2026-07-21)
+
+| Local skill | Notes |
+|---|---|
+| `i-have-adhd` | Full copy. Source comment in SKILL.md header tracks the pinned commit. |
+
+### How to update
+
+Check the repo for changes since the pinned commit:
+```bash
+gh api 'repos/ayghri/i-have-adhd/commits?since=2026-07-21' --jq '.[].sha'
+```
+
+### Update log
+
+| Date | What changed |
+|---|---|
+| 2026-07-21 | Initial install. Full copy of `skills/i-have-adhd/SKILL.md`. |
+
+---
+
 ## Local-only skills
 
 These are ours — not pulled from any upstream:
