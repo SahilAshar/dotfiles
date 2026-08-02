@@ -35,7 +35,16 @@ These exist in the repo but we don't use them — either they're Matt-specific, 
 - `to-prd` — Convert discussions into PRDs
 - `triage` — Issue state machine (Matt-specific labels/workflow)
 - `writing-great-skills` — Skill composition reference
-- `decision-mapping`, `review`, `writing-beats`, `writing-fragments`, `writing-shape` — In-progress skills
+- `batch-grill-me`, `claude-handoff`, `loop-me`, `setup-ts-deep-modules`, `to-questionnaire`, `wizard` — In-progress skills
+- `code-review` — Engineering code review skill
+- `research` — Engineering research skill
+- `to-spec` — Convert discussions into specs (was `to-prd`)
+- `to-tickets` — Break plans into tickets (was `to-issues`)
+- `wayfinder` — Navigation/routing skill
+- `edit-article` — Matt-specific personal skill
+- `obsidian-vault` — Matt-specific personal skill
+- `git-guardrails-claude-code`, `migrate-to-shoehorn`, `scaffold-exercises`, `setup-pre-commit` — Misc/niche skills
+- `writing-beats`, `writing-fragments`, `writing-shape` — In-progress writing skills
 
 ### How to update
 
@@ -60,6 +69,7 @@ These exist in the repo but we don't use them — either they're Matt-specific, 
 | Date | What changed |
 |---|---|
 | 2026-06-18 | Initial sync. Replaced `debug` with upstream `diagnosing-bugs` (6-phase discipline). Added HTML report to `improve-codebase-architecture`. Updated `handoff` (redaction, disable-model-invocation). Updated `grill-me` (wait-for-feedback). Updated `tdd` (CONTEXT.md awareness). Added `teach` skill (new). |
+| 2026-08-02 | Updated `tdd`: new Seams section, tautological anti-pattern, simplified rules of the loop (kept local deep-modules/interface-design refs). Updated `improve-codebase-architecture`: added YAGNI scoping and git-log hot-spot analysis to Explore step. Catalogued new upstream skills (code-review, research, to-spec, to-tickets, wayfinder, and in-progress/misc). |
 
 ---
 
@@ -84,7 +94,7 @@ gh api 'repos/hardikpandya/stop-slop/commits?since=2026-03-18' --jq '.[].sha'
 ## ayghri/i-have-adhd
 
 **Repo**: https://github.com/ayghri/i-have-adhd
-**Pinned at**: `0241185` (2026-07-21)
+**Pinned at**: `d05af1e` (2026-08-02)
 
 | Local skill | Notes |
 |---|---|
@@ -102,6 +112,7 @@ gh api 'repos/ayghri/i-have-adhd/commits?since=2026-07-21' --jq '.[].sha'
 | Date | What changed |
 |---|---|
 | 2026-07-21 | Initial install. Full copy of `skills/i-have-adhd/SKILL.md`. |
+| 2026-08-02 | Updated to latest. Added Persistence section, expanded tangent/restate rules, 2 new "when to break rules" items (rule-fights-task, rule-fights-harness), expanded pre-send check (hedge caveat, idiom ban). |
 
 ---
 
@@ -120,3 +131,5 @@ These are ours — not pulled from any upstream:
 - `session-log`
 - `sync-dotfiles`
 - `test-strategy`
+- `technical-writing-cleanup`
+- `writing-refinement`
