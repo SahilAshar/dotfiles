@@ -18,6 +18,9 @@ Tracks where skills came from and how to update them.
 | `improve-codebase-architecture` | `skills/engineering/improve-codebase-architecture/` | Upstream references `/codebase-design` for vocabulary. We keep the **inline glossary** (from LANGUAGE.md) since we don't carry that skill. HTML report format pulled from upstream. |
 | `tdd` | `skills/engineering/tdd/` | Close to upstream. We keep local `deep-modules.md` and `interface-design.md` (upstream replaced these with `/codebase-design` references). |
 | `teach` | `skills/productivity/teach/` | Full copy from upstream. |
+| `research` | `skills/engineering/research/` | Full copy from upstream. |
+| `code-review` | `skills/engineering/code-review/` | Adapted: removed `/setup-matt-pocock-skills` dep, uses `gh` CLI for issue/PR fetching. Smell baseline kept inline. |
+| `wayfinder` | `skills/engineering/wayfinder/` | Heavy local adaptation: inlined grilling, removed issue-tracker dep (local markdown in `.scratch/`), removed `/domain-modeling` `/research` `/prototype` skill refs. Self-contained. |
 
 ### Skills we DON'T pull (upstream-only)
 
@@ -31,16 +34,11 @@ These exist in the repo but we don't use them — either they're Matt-specific, 
 - `prototype` — Throwaway prototype builder
 - `resolving-merge-conflicts` — Merge conflict skill
 - `setup-matt-pocock-skills` — Setup wizard for his full skill suite
-- `to-issues` — Break plans into GitHub issues
-- `to-prd` — Convert discussions into PRDs
 - `triage` — Issue state machine (Matt-specific labels/workflow)
 - `writing-great-skills` — Skill composition reference
-- `batch-grill-me`, `claude-handoff`, `loop-me`, `setup-ts-deep-modules`, `to-questionnaire`, `wizard` — In-progress skills
-- `code-review` — Engineering code review skill
-- `research` — Engineering research skill
 - `to-spec` — Convert discussions into specs (was `to-prd`)
 - `to-tickets` — Break plans into tickets (was `to-issues`)
-- `wayfinder` — Navigation/routing skill
+- `batch-grill-me`, `claude-handoff`, `loop-me`, `setup-ts-deep-modules`, `to-questionnaire`, `wizard` — In-progress skills
 - `edit-article` — Matt-specific personal skill
 - `obsidian-vault` — Matt-specific personal skill
 - `git-guardrails-claude-code`, `migrate-to-shoehorn`, `scaffold-exercises`, `setup-pre-commit` — Misc/niche skills
@@ -69,7 +67,7 @@ These exist in the repo but we don't use them — either they're Matt-specific, 
 | Date | What changed |
 |---|---|
 | 2026-06-18 | Initial sync. Replaced `debug` with upstream `diagnosing-bugs` (6-phase discipline). Added HTML report to `improve-codebase-architecture`. Updated `handoff` (redaction, disable-model-invocation). Updated `grill-me` (wait-for-feedback). Updated `tdd` (CONTEXT.md awareness). Added `teach` skill (new). |
-| 2026-08-02 | Updated `tdd`: new Seams section, tautological anti-pattern, simplified rules of the loop (kept local deep-modules/interface-design refs). Updated `improve-codebase-architecture`: added YAGNI scoping and git-log hot-spot analysis to Explore step. Catalogued new upstream skills (code-review, research, to-spec, to-tickets, wayfinder, and in-progress/misc). |
+| 2026-08-02 | Updated `tdd`: new Seams section, tautological anti-pattern, simplified rules of the loop (kept local deep-modules/interface-design refs). Updated `improve-codebase-architecture`: added YAGNI scoping and git-log hot-spot analysis to Explore step. Added `research` (full copy). Added `code-review` (adapted, removed setup dep). Added `wayfinder` (heavy adaptation: self-contained, local-file tracker, inlined grilling). Catalogued remaining new upstream skills (to-spec, to-tickets, and in-progress/misc). |
 
 ---
 
