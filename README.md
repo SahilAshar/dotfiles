@@ -56,6 +56,7 @@ The installer is fully idempotent - safe to run multiple times.
   skills/              # Universal skills (symlinked into ~/.claude/skills/)
     debug/             # Systematic debugging methodology
     design-review/     # Two-reviewer architecture review
+    herdr/             # Portable, on-demand Herdr discovery
     pr-description/    # PR description writer from git diffs
     readability/       # Readability-focused code review
     refactor/          # Safe, incremental refactor planner
@@ -109,6 +110,10 @@ This repo implements a three-layer approach to AI-assisted development:
 **Examples**: `readability` (code review heuristics), `debug` (systematic debugging), `pr-description` (PR writer)
 **Behavior**: Agent decides when to load based on task relevance
 **Deployment**: Symlinked into `~/.claude/skills/` via `install.sh` for global availability
+
+**Optional shared Herdr discovery**: [Activation and safety notes](docs/herdr.md)
+cover a standalone, opt-in Herdr-only link for Pi's shared skills directory.
+No global context or harness settings are overwritten.
 
 ### Layer 3: Agents (Workflow Orchestrators)
 **Location**: `.github/agents/*.md`  
