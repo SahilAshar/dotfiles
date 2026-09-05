@@ -36,6 +36,7 @@ jobs:
         run: |
           bash tests/test-install.sh
           bash tests/test-herdr.sh
+          bash tests/test-agent-config.sh
 
   integration:
     name: Integration Test

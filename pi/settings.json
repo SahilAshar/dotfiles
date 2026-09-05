@@ -1,0 +1,10 @@
+{
+  "defaultProvider": "openai-codex",
+  "defaultModel": "gpt-6-astra",
+  "theme": "dark",
+  "skills": ["~/.claude/skills"],
+  "defaultProjectTrust": "ask",
+  "warnings": {
+    "anthropicExtraUsage": true
+  }
+}

@@ -1,13 +1,19 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Opt-in, Herdr-only deployment; never invoke the general dotfiles installer.
+# Focused opt-in bootstrap; never invoke the general dotfiles installer.
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+case "${1:-}" in
+  --pi|--herdr|--claude-skills)
+    exec python3 "$SCRIPT_DIR/scripts/bootstrap-agent-config.py" "$@"
+    ;;
+esac
 if [ "$#" -ne 1 ] || [ "$1" != "--shared" ]; then
-  echo "Usage: bash install-herdr-skill.sh --shared" >&2
+  echo "Usage: bash install-herdr-skill.sh --shared OR [--pi] [--herdr] [--claude-skills]" >&2
   exit 2
 fi
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+echo "WARNING: --shared is an alternative; do not use if Pi already loads ~/.claude/skills (duplicate names)." >&2
 src="$SCRIPT_DIR/.claude/skills/herdr"
 : "${HOME:?HOME must be set}"
 if [ ! -f "$src/SKILL.md" ]; then

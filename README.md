@@ -90,6 +90,9 @@ zsh/
   .zshrc               # Zsh configuration
   .p10k.zsh            # Powerlevel10k theme configuration
 apt-packages.txt       # Linux packages to install
+pi/                   # Portable Pi preferences (not auth/state)
+herdr/                # Portable Herdr preferences (not generated integrations)
+install-herdr-skill.sh # OPTIONAL focused skills/Pi/Herdr bootstrap
 install.sh             # PRIMARY ENTRY POINT (auto-run by Codespaces)
 README.md              # You are here
 ```
@@ -111,9 +114,11 @@ This repo implements a three-layer approach to AI-assisted development:
 **Behavior**: Agent decides when to load based on task relevance
 **Deployment**: Symlinked into `~/.claude/skills/` via `install.sh` for global availability
 
-**Optional shared Herdr discovery**: [Activation and safety notes](docs/herdr.md)
-cover a standalone, opt-in Herdr-only link for Pi's shared skills directory.
-No global context or harness settings are overwritten.
+**Optional Pi + Herdr setup**: [Bootstrap and safety notes](docs/herdr.md)
+cover portable preferences in `pi/` and `herdr/`, safe per-skill Claude links,
+and a focused opt-in installer. Mutable settings use conflict-checked copies/merges,
+not symlinks; no global context is overwritten. The original shared Herdr-only
+skill link remains an alternative to Pi loading the global Claude skill collection.
 
 ### Layer 3: Agents (Workflow Orchestrators)
 **Location**: `.github/agents/*.md`  
