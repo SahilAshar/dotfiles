@@ -1,0 +1,8 @@
+# Portable preferences, not a copy of Herdr's runtime directory.
+# Leave onboarding unset so each machine can complete notification setup.
+[ui]
+agent_panel_sort = "spaces"
+confirm_close = true
+
+[ui.toast]
+delivery = "terminal"

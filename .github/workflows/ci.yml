@@ -22,7 +22,7 @@ jobs:
         run: apt-get update -qq && apt-get install -y -qq shellcheck
 
       - name: Lint all shell scripts
-        run: shellcheck install.sh tests/*.sh
+        run: shellcheck install.sh install-herdr-skill.sh tests/*.sh
 
   test:
     name: Unit Tests
@@ -36,7 +36,10 @@ jobs:
         run: bash tests/test-skill-frontmatter.sh
 
       - name: Run test suite
-        run: bash tests/test-install.sh
+        run: |
+          bash tests/test-install.sh
+          bash tests/test-herdr.sh
+          bash tests/test-agent-config.sh
 
   integration:
     name: Integration Test

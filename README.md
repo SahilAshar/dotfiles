@@ -56,6 +56,7 @@ The installer is fully idempotent - safe to run multiple times.
   skills/              # Universal skills (symlinked into ~/.claude/skills/)
     debug/             # Systematic debugging methodology
     design-review/     # Two-reviewer architecture review
+    herdr/             # Portable, on-demand Herdr discovery
     pr-description/    # PR description writer from git diffs
     readability/       # Readability-focused code review
     refactor/          # Safe, incremental refactor planner
@@ -89,6 +90,9 @@ zsh/
   .zshrc               # Zsh configuration
   .p10k.zsh            # Powerlevel10k theme configuration
 apt-packages.txt       # Linux packages to install
+pi/                   # Portable Pi preferences (not auth/state)
+herdr/                # Portable Herdr preferences (not generated integrations)
+install-herdr-skill.sh # OPTIONAL focused skills/Pi/Herdr bootstrap
 install.sh             # PRIMARY ENTRY POINT (auto-run by Codespaces)
 README.md              # You are here
 ```
@@ -109,6 +113,12 @@ This repo implements a three-layer approach to AI-assisted development:
 **Examples**: `readability` (code review heuristics), `debug` (systematic debugging), `pr-description` (PR writer)
 **Behavior**: Agent decides when to load based on task relevance
 **Deployment**: Symlinked into `~/.claude/skills/` via `install.sh` for global availability
+
+**Optional Pi + Herdr setup**: [Bootstrap and safety notes](docs/herdr.md)
+cover portable preferences in `pi/` and `herdr/`, safe per-skill Claude links,
+and a focused opt-in installer. Mutable settings use conflict-checked copies/merges,
+not symlinks; no global context is overwritten. The original shared Herdr-only
+skill link remains an alternative to Pi loading the global Claude skill collection.
 
 ### Layer 3: Agents (Workflow Orchestrators)
 **Location**: `.github/agents/*.md`  
