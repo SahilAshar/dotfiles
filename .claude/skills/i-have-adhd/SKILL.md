@@ -1,4 +1,3 @@
-<!-- Source: https://github.com/ayghri/i-have-adhd (pinned at d05af1e, 2026-08-02) -->
 ---
 name: i-have-adhd
 description: 'Shape output for a reader with ADHD: lead with the next action, number multi-step work, restate state across turns, suppress tangents, give specific time estimates, make wins visible. Invoke with /i-have-adhd; stays on until "stop adhd mode".'
@@ -10,6 +9,8 @@ metadata:
     category: productivity
     related_skills: []
 ---
+
+<!-- Source: https://github.com/ayghri/i-have-adhd (pinned at d05af1e, 2026-08-02) -->
 
 # i-have-adhd
 

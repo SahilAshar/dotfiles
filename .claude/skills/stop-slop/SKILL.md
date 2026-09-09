@@ -1,4 +1,3 @@
-<!-- Source: https://github.com/hardikpandya/stop-slop (pinned at 8da1f03, 2026-03-18) -->
 ---
 name: stop-slop
 description: Remove AI writing patterns from prose. Use when drafting, editing, or reviewing text to eliminate predictable AI tells.
@@ -6,6 +5,8 @@ metadata:
   trigger: Writing prose, editing drafts, reviewing content for AI patterns
   author: Hardik Pandya (https://hvpandya.com)
 ---
+
+<!-- Source: https://github.com/hardikpandya/stop-slop (pinned at 8da1f03, 2026-03-18) -->
 
 # Stop Slop
 
