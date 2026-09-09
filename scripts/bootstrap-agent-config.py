@@ -163,8 +163,10 @@ def main():
             if dest.exists():
                 raise ValueError(f"Existing skill left untouched: {dest}")
             links.append((src, dest))
-    # Reject overlapping destinations selected via overrides before any writes.
+    # Backups are write targets too: overrides must not occupy them or their children.
     targets = [plan[0] for plan in plans if plan] + [dest for _, dest in links]
+    targets += [Path(str(plan[0]) + ".dotfiles.bak")
+                for plan in plans if plan and plan[1] is not None]
     for index, target in enumerate(targets):
         for other in targets[index + 1:]:
             if target == other or target in other.parents or other in target.parents:

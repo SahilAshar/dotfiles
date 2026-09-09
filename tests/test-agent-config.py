@@ -126,6 +126,17 @@ class BootstrapTests(unittest.TestCase):
         self.run_bootstrap("--pi", "--herdr", ok=False)
         self.assertFalse(self.settings.exists())
 
+    def test_backup_destination_overlap_refused_before_writes(self):
+        for suffix in ("", "/config.toml"):
+            with self.subTest(suffix=suffix):
+                self.write(self.settings, "{}")
+                backup = Path(str(self.settings) + ".dotfiles.bak")
+                self.env["HERDR_CONFIG_PATH"] = str(backup) + suffix
+                self.run_bootstrap("--pi", "--herdr", ok=False)
+                self.assertEqual(self.settings.read_text(), "{}")
+                self.assertFalse(backup.exists())
+                self.assertFalse(self.keys.exists())
+
     def test_backup_collision(self):
         self.write(self.settings, "{}")
         backup = Path(str(self.settings) + ".dotfiles.bak")
