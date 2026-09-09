@@ -32,6 +32,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Check shared skill frontmatter
+        run: bash tests/test-skill-frontmatter.sh
+
       - name: Run test suite
         run: bash tests/test-install.sh
 
