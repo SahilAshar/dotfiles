@@ -114,6 +114,32 @@ gh api 'repos/ayghri/i-have-adhd/commits?since=2026-07-21' --jq '.[].sha'
 
 ---
 
+## warpdotdev/common-skills
+
+**Repo**: https://github.com/warpdotdev/common-skills
+**Pinned at**: `8792394` (2026-10-20)
+
+| Local skill | Upstream path | Notes |
+|---|---|---|
+| `merge-risk` | `.agents/skills/merge-risk/` | Adapted: expanded `description` with trigger phrases, added a "Gather inputs" section (`gh pr view`/`gh pr diff`, linked issue, CI status). Scoring rubric and output format unchanged. Upstream credits Matt Pocock's `pr` skill, which is a PR-body writer — not tracked here. |
+
+### How to update
+
+Check the repo for changes since the pinned commit:
+```bash
+gh api 'repos/warpdotdev/common-skills/commits?path=.agents/skills/merge-risk/SKILL.md&since=2026-10-20' --jq '.[].sha'
+```
+
+Preserve the local `description` and "Gather inputs" section when merging.
+
+### Update log
+
+| Date | What changed |
+|---|---|
+| 2026-10-20 | Initial install from `8792394`. |
+
+---
+
 ## Local-only skills
 
 These are ours — not pulled from any upstream:
