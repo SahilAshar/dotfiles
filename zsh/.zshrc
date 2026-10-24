@@ -144,3 +144,6 @@ export NVM_DIR="$HOME/.nvm"
 
 # opencode
 export PATH=/Users/sahilashar/.opencode/bin:$PATH
+
+# Machine-local secrets and overrides (not tracked)
+if [ -f "$HOME/.zshrc.local" ]; then source "$HOME/.zshrc.local"; fi
