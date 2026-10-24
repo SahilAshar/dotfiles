@@ -128,7 +128,7 @@ User invokes with a loose idea.
 1. **Name the destination.** Interview the user one question at a time — provide a recommended answer with each — to pin down what this map is finding its way to. The destination fixes the scope, so it's settled first.
 2. **Map the frontier.** Interview again, **breadth-first** this time: fan out across the whole space rather than deep on any one thread, surfacing the open decisions and the first steps takeable now. **If this surfaces no fog** — the way to the destination is already clear, the whole journey small enough for one session — you don't need a map. Stop and ask the user how they'd like to proceed.
 3. **Create the map**: write `MAP.md` with Destination and Notes filled in, Decisions-so-far empty, fog sketched into Not yet specified.
-4. **Create the tickets you can specify now** as files in `tickets/` — then fill in blocking edges (tickets need to exist before they can reference each other).
+4. **Create the tickets you can specify now** as files in `tickets/` — then fill in blocking edges and cross-references in a second pass, using the real ticket numbers (tickets need to exist before they can reference each other; never leave a placeholder like `NN`).
 5. **Fire background research.** For each research ticket, spin up a background agent to resolve it in parallel.
 6. Stop — charting is one session's work; it resolves nothing itself.
 
@@ -139,6 +139,6 @@ User invokes with a map path or effort name. A ticket is optional — without on
 1. Load the **map** — the low-res view, not every ticket body.
 2. Choose the ticket. If the user named one, use it. Otherwise take the first unblocked, open ticket.
 3. **Claim it**: set status to `claimed` before any work.
-4. Resolve it — read related resolved tickets as needed for context. For grilling tickets: interview one question at a time, recommended answer attached. For research: spin up a background agent. For prototypes: build the artifact. For tasks: do the work or hand the user a checklist.
+4. Resolve it as the type its **Type:** field names — read the field, don't infer the type from the question. Read related resolved tickets as needed for context. For grilling tickets: interview one question at a time, recommended answer attached. For research: spin up a background agent. For prototypes: build the artifact. For tasks: do the work or hand the user a checklist.
 5. Record the resolution: fill in the Resolution section, set status to `resolved`, and append a one-line gist to the map's Decisions-so-far.
 6. Graduate fog: add newly-surfaced tickets, clear each graduated patch from Not yet specified. If the resolution invalidates other tickets, update or close them.
