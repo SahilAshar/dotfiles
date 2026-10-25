@@ -1,4 +1,9 @@
-# Skill: Research to One-Pager
+---
+name: research-to-one-pager
+description: Turn an existing research document (design doc, investigation notes, competitive analysis) into a concise, presentation-ready one-pager for a specific audience such as leadership, security reviewers, or partner teams. Covers drafting, grounding claims in official sources, review rounds, and extending the doc after the presentation. Use when the user asks for a one-pager, wants to distill research for stakeholders, or says "research to one-pager".
+---
+
+# Research to One-Pager
 
 Convert an existing research document into a concise one-pager suitable for presenting to stakeholders. This skill covers the full lifecycle: drafting, iterative review, grounding claims with internal sources, and extending the document as new questions arise.
 
