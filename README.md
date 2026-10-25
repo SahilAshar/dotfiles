@@ -56,6 +56,7 @@ The installer is fully idempotent - safe to run multiple times.
   skills/              # Universal skills (symlinked into ~/.claude/skills/)
     debug/             # Systematic debugging methodology
     design-review/     # Two-reviewer architecture review
+    herdr/             # On-demand Herdr discovery
     pr-description/    # PR description writer from git diffs
     readability/       # Readability-focused code review
     refactor/          # Safe, incremental refactor planner
