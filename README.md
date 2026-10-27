@@ -20,7 +20,7 @@ When you create a Codespace with this dotfiles repo configured:
 1. **Installs packages** - `zsh`, `ripgrep`, and other essentials (Linux only)
 2. **Configures shell** - Sets up zsh with Oh My Zsh, Powerlevel10k theme, autosuggestions, and syntax highlighting
 3. **Links configurations** - Symlinks `.bashrc`, `.zshrc`, `.p10k.zsh`, `.gitconfig`, `.tmux.conf`, VS Code settings
-4. **Deploys agentic workflows** - Copilot agents/skills are auto-discovered from `.github/`; Claude Code skills are symlinked into `~/.claude/skills/`
+4. **Deploys agentic workflows** - Copilot agents are auto-discovered from `.github/`; universal skills are symlinked into both `~/.claude/skills/` and `~/.agents/skills/` for Claude Code and Codex
 
 **Total time**: ~30 seconds on a fresh Codespace.  
 **Manual steps required**: Zero.
@@ -53,7 +53,7 @@ The installer is fully idempotent - safe to run multiple times.
 .claude/
   settings.json        # Claude Code settings (merged into ~/.claude/)
   statusline-command.sh # Claude Code statusline script
-  skills/              # Universal skills (symlinked into ~/.claude/skills/)
+  skills/              # Universal skills (deployed to Claude Code and Codex)
     debug/             # Systematic debugging methodology
     design-review/     # Two-reviewer architecture review
     herdr/             # On-demand Herdr discovery
@@ -109,7 +109,7 @@ This repo implements a three-layer approach to AI-assisted development:
 **Purpose**: Reusable, specialized capabilities loaded on-demand
 **Examples**: `readability` (code review heuristics), `debug` (systematic debugging), `pr-description` (PR writer)
 **Behavior**: Agent decides when to load based on task relevance
-**Deployment**: Symlinked into `~/.claude/skills/` via `install.sh` for global availability
+**Deployment**: Symlinked into `~/.claude/skills/` for Claude Code and `~/.agents/skills/` for Codex via `install.sh`
 
 ### Layer 3: Agents (Workflow Orchestrators)
 **Location**: `.github/agents/*.md`  
@@ -201,6 +201,7 @@ Configuration is deployed via symlinks or JSON merge, depending on the tool:
 - `~/.tmux.conf` → `dotfiles/tmux/.tmux.conf`
 - `~/.config/ghostty/config` → `dotfiles/ghostty/config`
 - `~/.claude/skills/*` → `dotfiles/.claude/skills/*`
+- `~/.agents/skills/*` → `dotfiles/.claude/skills/*`
 
 **JSON-merged** (dotfiles settings merged into existing config):
 - VS Code: merged into `~/.vscode-remote/` and `~/.vscode-server/` machine settings
@@ -232,7 +233,7 @@ See [`.github/agents/readability-reviewer.md`](.github/agents/readability-review
 
 ### Creating New Skills
 
-All skills live in `.claude/skills/` and are deployed globally via `install.sh`.
+All skills live in `.claude/skills/` and are deployed globally to Claude Code and Codex via `install.sh`.
 
 1. Create `.claude/skills/my-skill/SKILL.md`
 2. Add YAML frontmatter with `name` and `description` (include trigger keywords)
@@ -291,6 +292,12 @@ shellcheck install.sh tests/*.sh
 2. Reload VS Code window: `Cmd+Shift+P` → "Reload Window"
 3. Check Copilot status: `@workspace /help`
 4. Wait 5-10 minutes for indexing
+
+### Skills not appearing in Codex
+
+1. Run `./install.sh` and verify `~/.agents/skills/` contains symlinks
+2. Confirm each skill directory contains a `SKILL.md` with `name` and `description` frontmatter
+3. Restart Codex if newly deployed skills do not appear automatically
 
 ### Shell config changes not applying
 

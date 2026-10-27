@@ -24,3 +24,13 @@
 [user]
 	name = Sahil Ashar
 	email = sahilashar16@gmail.com
+
+# Machine-local overrides (untracked): URL rewrites, secrets, etc.
+# Silently skipped if the file does not exist (e.g. a personal machine).
+[include]
+	path = ~/.gitconfig.local
+
+# Work identity, applied only to repos under ~/Repos/.
+# Untracked, so it stays out of this public repo.
+[includeIf "gitdir:~/Repos/"]
+	path = ~/.gitconfig.work
