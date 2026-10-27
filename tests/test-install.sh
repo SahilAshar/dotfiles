@@ -124,6 +124,35 @@ else
   fail "Merges .claude/settings.json via deploy_claude_settings" "Missing Claude settings merge in deploy_claude_settings"
 fi
 
+# Test: universal skills are deployed for both Claude Code and Codex
+# shellcheck disable=SC2016 # Intentional: matching literal ${} in source
+if grep -q 'deploy_skills "Claude Code" "${CLAUDE_CONFIG_DIR:-$HOME/.claude}/skills"' "$INSTALL_SH"; then
+  pass "Deploys universal skills into Claude Code's user skills directory"
+else
+  fail "Deploys universal skills into Claude Code's user skills directory" "Missing Claude Code deploy_skills call"
+fi
+
+# shellcheck disable=SC2016 # Intentional: matching literal ${} in source
+if grep -q 'deploy_skills "Codex" "$HOME/.agents/skills"' "$INSTALL_SH"; then
+  pass "Deploys universal skills into Codex's user skills directory"
+else
+  fail "Deploys universal skills into Codex's user skills directory" "Missing Codex deploy_skills call"
+fi
+
+# Test: every skill starts with YAML frontmatter so Claude Code and Codex can discover it
+invalid_skill_frontmatter=""
+while IFS= read -r skill_file; do
+  if [ "$(head -n 1 "$skill_file")" != "---" ]; then
+    invalid_skill_frontmatter="${invalid_skill_frontmatter}${skill_file#"$REPO_ROOT"/} "
+  fi
+done < <(find "$REPO_ROOT/.claude/skills" -mindepth 2 -maxdepth 2 -name SKILL.md -print)
+
+if [ -z "$invalid_skill_frontmatter" ]; then
+  pass "Every universal skill starts with YAML frontmatter"
+else
+  fail "Every universal skill starts with YAML frontmatter" "Invalid: $invalid_skill_frontmatter"
+fi
+
 # Test: install.sh deploys VS Code settings
 if grep -q 'deploy_vscode_settings' "$INSTALL_SH"; then
   pass "Calls deploy_vscode_settings during install"
@@ -362,7 +391,54 @@ rm -rf "$SANDBOX"
 
 echo ""
 
-# ── 6. Idempotency guards (static analysis) ─────────────────
+# ── 6. Skill deployment behavior ───────────────────────────
+
+echo "Skill deployment behavior"
+
+SKILLS_SANDBOX="$(mktemp -d)"
+SKILLS_DOTFILES="$SKILLS_SANDBOX/dotfiles"
+CLAUDE_SKILLS="$SKILLS_SANDBOX/home/.claude/skills"
+CODEX_SKILLS="$SKILLS_SANDBOX/home/.agents/skills"
+mkdir -p "$SKILLS_DOTFILES/.claude/skills/example"
+cat > "$SKILLS_DOTFILES/.claude/skills/example/SKILL.md" <<'EOF'
+---
+name: example
+description: Example fixture skill.
+---
+EOF
+
+# Exercise the installer's real helper without running the full installer.
+sed -n '/^deploy_skills()/,/^}/p' "$INSTALL_SH" > "$SKILLS_SANDBOX/deploy_skills.sh"
+DOTFILES_DIR="$SKILLS_DOTFILES" bash -c '
+  set -euo pipefail
+  source "$1"
+  deploy_skills "Claude Code" "$2"
+  deploy_skills "Codex" "$3"
+' _ "$SKILLS_SANDBOX/deploy_skills.sh" "$CLAUDE_SKILLS" "$CODEX_SKILLS"
+
+expected_target="$SKILLS_DOTFILES/.claude/skills/example/"
+if [ "$(readlink "$CLAUDE_SKILLS/example")" = "$expected_target" ] && [ "$(readlink "$CODEX_SKILLS/example")" = "$expected_target" ]; then
+  pass "Links each universal skill into both Claude Code and Codex"
+else
+  fail "Links each universal skill into both Claude Code and Codex" "One or both skill symlinks have the wrong target"
+fi
+
+output=$(DOTFILES_DIR="$SKILLS_DOTFILES" bash -c '
+  set -euo pipefail
+  source "$1"
+  deploy_skills "Codex" "$2"
+' _ "$SKILLS_SANDBOX/deploy_skills.sh" "$CODEX_SKILLS" 2>&1)
+if echo "$output" | grep -q 'Codex skill symlink already correct: example'; then
+  pass "Skill deployment is idempotent"
+else
+  fail "Skill deployment is idempotent" "Got: $output"
+fi
+
+rm -rf "$SKILLS_SANDBOX"
+
+echo ""
+
+# ── 7. Idempotency guards (static analysis) ─────────────────
 
 echo "Idempotency guards"
 
@@ -410,7 +486,7 @@ fi
 
 echo ""
 
-# ── 7. Script safety ────────────────────────────────────────
+# ── 8. Script safety ────────────────────────────────────────
 
 echo "Script safety"
 
@@ -450,7 +526,7 @@ else
   fail "Has targeted yarn apt source recovery logic" "Missing helper function or yarn source detection"
 fi
 
-# ── 8. Statusline script behavior ─────────────────────────
+# ── 9. Statusline script behavior ─────────────────────────
 
 echo "Statusline script behavior"
 

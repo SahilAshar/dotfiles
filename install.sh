@@ -339,6 +339,62 @@ deploy_claude_settings() {
   fi
 }
 
+# Link universal skills into a tool's user-level discovery directory.
+# Args: tool_label target_skills_directory
+deploy_skills() {
+  local tool_label="$1"
+  local target_skills_dir="$2"
+  local source_skills_dir="$DOTFILES_DIR/.claude/skills"
+
+  if [ ! -d "$source_skills_dir" ]; then
+    echo "→ No universal skills found; skipping $tool_label skill deployment"
+    return
+  fi
+
+  # Avoid replacing the canonical skill directories if a target points at the source itself.
+  if [ "$(readlink -f "$source_skills_dir")" = "$(readlink -f "$target_skills_dir")" ] 2>/dev/null; then
+    echo "✓ $tool_label skills already in place (same path): $target_skills_dir"
+    return
+  fi
+
+  echo "→ Linking $tool_label skills..."
+  mkdir -p "$target_skills_dir"
+
+  for skill_dir in "$source_skills_dir"/*/; do
+    [ -d "$skill_dir" ] || continue
+
+    local skill_name
+    skill_name="$(basename "$skill_dir")"
+    if [ ! -f "$skill_dir/SKILL.md" ]; then
+      echo "⚠ Skipping skill '$skill_name': SKILL.md not found" >&2
+      continue
+    fi
+
+    local dest="$target_skills_dir/$skill_name"
+    if [ -L "$dest" ] && [ "$(readlink "$dest")" = "$skill_dir" ]; then
+      echo "✓ $tool_label skill symlink already correct: $skill_name"
+      continue
+    fi
+
+    if [ -L "$dest" ]; then
+      echo "→ Replacing existing $tool_label skill symlink: $skill_name"
+      rm "$dest"
+    elif [ -e "$dest" ]; then
+      local backup="$dest.bak"
+      if [ -e "$backup" ]; then
+        echo "✗ ERROR: Backup already exists: $backup" >&2
+        echo "  Resolve manually before re-running." >&2
+        exit 1
+      fi
+      echo "→ Backing up existing $tool_label skill: $dest → $backup"
+      mv "$dest" "$backup"
+    fi
+
+    ln -s "$skill_dir" "$dest"
+    echo "✓ Linked $tool_label skill: $skill_name → $skill_dir"
+  done
+}
+
 # Install Claude Code (Codespaces only)
 install_claude_code() {
   if [ -z "${CODESPACES:-}" ]; then
@@ -406,32 +462,8 @@ main() {
   fi
 
   deploy_claude_settings
-
-  if [ -d "$DOTFILES_DIR/.claude/skills" ]; then
-    echo "→ Linking Claude Code skills..."
-    local claude_skills_dir="${CLAUDE_CONFIG_DIR:-$HOME/.claude}/skills"
-    mkdir -p "$claude_skills_dir"
-    for skill_dir in "$DOTFILES_DIR/.claude/skills"/*/; do
-      [ -d "$skill_dir" ] || continue
-      local skill_name
-      skill_name="$(basename "$skill_dir")"
-      if [ ! -f "$skill_dir/SKILL.md" ]; then
-        echo "⚠ Skipping skill '$skill_name': SKILL.md not found" >&2
-        continue
-      fi
-      local dest="$claude_skills_dir/$skill_name"
-      if [ -L "$dest" ] && [ "$(readlink "$dest")" = "$skill_dir" ]; then
-        echo "✓ Skill symlink already correct: $skill_name"
-      else
-        if [ -L "$dest" ] || [ -e "$dest" ]; then
-          echo "→ Replacing existing skill: $skill_name"
-          rm -rf "$dest"
-        fi
-        ln -s "$skill_dir" "$dest"
-        echo "✓ Linked skill: $skill_name → $skill_dir"
-      fi
-    done
-  fi
+  deploy_skills "Claude Code" "${CLAUDE_CONFIG_DIR:-$HOME/.claude}/skills"
+  deploy_skills "Codex" "$HOME/.agents/skills"
 
   echo ""
 

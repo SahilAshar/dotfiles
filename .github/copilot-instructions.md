@@ -31,13 +31,13 @@ Modern development increasingly happens *with* AI agents in ephemeral cloud envi
 
 **Codespaces-first design**: Everything assumes `/workspaces/.codespaces/.persistedshare/dotfiles` as the clone location. Automatic execution via `install.sh`. Idempotent reruns.
 
-**`install.sh` execution flow**: Calls discrete functions in order: `install_apt_packages` → `install_ohmyzsh` → `install_powerlevel10k` → `install_zsh_autosuggestions` → `link_file` (symlinks) → `deploy_claude_settings` → `install_claude_code` → `deploy_vscode_settings`. Each function is independently idempotent — checks if work is already done before acting. Copilot agents/skills in `.github/` are auto-discovered, not deployed.
+**`install.sh` execution flow**: Calls discrete functions in order: `install_apt_packages` → `install_ohmyzsh` → `install_powerlevel10k` → `install_zsh_autosuggestions` → `link_file` (symlinks) → `deploy_claude_settings` → `deploy_skills` (Claude Code and Codex) → `install_claude_code` → `deploy_vscode_settings`. Each function is independently idempotent — checks if work is already done before acting. Copilot agents in `.github/` are auto-discovered, not deployed.
 
 **Symlink strategy**: Config files live in this repo and are symlinked into `$HOME` via the `link_file` helper. It backs up existing files to `.bak`, skips if symlink already points correctly, and fails if a `.bak` already exists (requires manual resolution).
 
 **Agentic workflow strategy**:
 - **Universal agents** (`.github/agents/`): Portable across all workspaces (e.g., `readability-reviewer.md`)
-- **Universal skills** (`.claude/skills/`): Canonical skill home, symlinked globally via `install.sh` (e.g., `readability/`, `debug/`, `pr-description/`)
+- **Universal skills** (`.claude/skills/`): Canonical skill home, symlinked globally into Claude Code's `~/.claude/skills/` and Codex's `~/.agents/skills/` via `install.sh`
 - **Custom instructions** (`.github/copilot-instructions.md`): Always-on repo guidance
 - **Workspace-specific agents**: Generated per-repo via automation (future goal)
 
@@ -68,7 +68,7 @@ No way to run a single test — `tests/test-install.sh` is one script with inlin
 ## Project Structure
 ```
 .claude/
-  skills/              # Universal skills (canonical home, symlinked globally)
+  skills/              # Universal skills (canonical home, deployed to Claude Code and Codex)
 .github/
   agents/              # Universal agents (portable across workspaces)
   workflows/ci.yml     # CI pipeline (lint + test + integration)
@@ -80,7 +80,7 @@ git/
 ghostty/
   config              # Ghostty terminal configuration
 tests/
-  test-install.sh     # 22 unit tests (static analysis + sandboxed behavioral tests)
+  test-install.sh     # Unit tests (static analysis + sandboxed behavioral tests)
 zsh/
   .zshrc             # Zsh configuration
   .p10k.zsh          # Powerlevel10k theme config
