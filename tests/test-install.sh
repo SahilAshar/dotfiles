@@ -125,12 +125,14 @@ else
 fi
 
 # Test: universal skills are deployed for both Claude Code and Codex
+# shellcheck disable=SC2016 # Intentional: matching literal ${} in source
 if grep -q 'deploy_skills "Claude Code" "${CLAUDE_CONFIG_DIR:-$HOME/.claude}/skills"' "$INSTALL_SH"; then
   pass "Deploys universal skills into Claude Code's user skills directory"
 else
   fail "Deploys universal skills into Claude Code's user skills directory" "Missing Claude Code deploy_skills call"
 fi
 
+# shellcheck disable=SC2016 # Intentional: matching literal ${} in source
 if grep -q 'deploy_skills "Codex" "$HOME/.agents/skills"' "$INSTALL_SH"; then
   pass "Deploys universal skills into Codex's user skills directory"
 else
@@ -141,7 +143,7 @@ fi
 invalid_skill_frontmatter=""
 while IFS= read -r skill_file; do
   if [ "$(head -n 1 "$skill_file")" != "---" ]; then
-    invalid_skill_frontmatter="${invalid_skill_frontmatter}${skill_file#$REPO_ROOT/} "
+    invalid_skill_frontmatter="${invalid_skill_frontmatter}${skill_file#"$REPO_ROOT"/} "
   fi
 done < <(find "$REPO_ROOT/.claude/skills" -mindepth 2 -maxdepth 2 -name SKILL.md -print)
 
